@@ -4,9 +4,9 @@ options:
 	uMyC: [MyC]
 	   
 on join:
-	if {ss.%player%.exists} is not set:
-		set {ss.%player%.exists} to true
-		set {ss.%player%.buying} to false
+	if {ss.%uuid of player%.exists} is not set:
+		set {ss.%uuid of player%.exists} to true
+		set {ss.%uuid of player%.buying} to false
 	if {ss.%uuid of player%.lastplayer} is not set:
 		set {ss.%uuid of player%.lastplayer} to player
 	else if {ss.%uuid of player%.lastplayer} is not player:
@@ -29,10 +29,31 @@ every 10 seconds:
 			loop-player has permission "ss.admin":
 				send "{@P} ShopSearch is not on the latest version! your version &61.0&a. The new version is &6%{ss.version}%&a." to loop-player
 				
-command /ss-convert <text> [<text>]:
-	description: Convert a user
+command /ss-admin <text> [<text>]:
+	description: SearchShop Admin
 	permission: shopsearch.admin
 	trigger:
+		if arg 1 is "help":
+			message "{@P} ShopSearch admin command help"
+			message "{@P} /ss-admin delete <user> - Deletes a users added shops
+			message "{@P} /ss-admin clearall <user> - Removes the users added shops AND the chest/sign block"
+			message "{@P} /ss-admin convert <user from> <user to> - Converts a chest of a user to another"
+		else if arg 1 is "delete":
+			if arg 2 is set:
+				set {_p} to arg 2 parsed as player
+				if {ss.%uuid of {_p}%.exists} is true:
+					if {ss.%uuid of {_p}%.chests::*} is not empty:
+						delete {ss.%uuid of {_p}%.chests::*}
+						message "{@P} Deleted %{_p}%'s shops"
+					else:
+						message "{@P} %{_p}% has no shops"
+				else:
+					message "{@P} That user doesn't have exist"
+			else:
+				message "{@P} You must provide a players name to delete
+		
+	
+	
 		if arg 1 is not set:
 			message "{@P} Invalid arguments"
 		else if arg 1 is "help":
