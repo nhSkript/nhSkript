@@ -1,7 +1,10 @@
 options:
-	P: &8[&aSS&8]&a
-	MyC: &6[&eMyC&6]&e
-	uMyC: [MyC]
+	P: &8[&aSS&8]&a     # ShopSearch prefix
+	MyC: &6[&eMyC&6]&e  # MyConomy Prefix
+	uMyC: [MyC]         # MyConomy logging prefix
+	# Curreny related stuff #
+	B-C: true           # Symbol before. Example: $1000. Set to false for: 1000$
+	C: $                # Currency symbol.
 	   
 on join:
 	if {ss.%uuid of player%.exists} is not set:
@@ -9,6 +12,8 @@ on join:
 		set {ss.%uuid of player%.buying} to false
 	if {ss.%uuid of player%.lastplayer} is not set:
 		set {ss.%uuid of player%.lastplayer} to player
+	if (ss.playerlist::%player%} is not set:
+		set {ss.playerlist::%player%} to player
 	else if {ss.%uuid of player%.lastplayer} is not player:
 		set {_p} to {ss.%uuid of player%.lastplayer} parsed as player
 		loop {ss.%{_p}%.chests::*}:
@@ -91,6 +96,18 @@ command /shopsearch <text> [<integer>] [<item>]:
 	trigger:
 		if arg 1 is not set:
 			message "{@P} You must give a subcommand!"
+		else if arg 1 is "stats":
+			if arg 2 is "shops":
+				loop {ss.playerlist::*}:
+					add size of {ss.%player%.chests::*} to {_count}
+				message "{@P} There are currently: %{_count}% shops!"
+			else if arg 2 is "money":
+				if {@B-C} is true:
+					message "{@P} A total of: {@C}%{ss.totalmoney}% has been sent using ShopSearch"
+				else:
+					message "{@P} A total of: %{ss.totalmoney}%{@C} has been sent using ShopSearch"
+			else if arg 2 is "items":
+				# Coming soon
 		else if arg 1 is "add":
 			message "{@P} Right click to add a chest!"
 			set {ss.%uuid of player%.add} to true
