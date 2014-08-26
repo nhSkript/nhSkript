@@ -42,35 +42,46 @@ command /ss-admin <text> [<text>]:
 			if arg 2 is set:
 				set {_p} to arg 2 parsed as player
 				if {ss.%uuid of {_p}%.exists} is true:
-					if {ss.%uuid of {_p}%.chests::*} is not empty:
-						delete {ss.%uuid of {_p}%.chests::*}
-						message "{@P} Deleted %{_p}%'s shops"
+					if {ss.%{_p}%.chests::*} is not empty:
+						message "{@P} Deleted %{_p}%'s shops (%size of {ss.%{_p}%.chests::*}"
+						delete {ss.%{_p}%.chests::*}
 					else:
 						message "{@P} %{_p}% has no shops"
 				else:
 					message "{@P} That user doesn't have exist"
 			else:
-				message "{@P} You must provide a players name to delete
-		
-	
-	
-		if arg 1 is not set:
-			message "{@P} Invalid arguments"
-		else if arg 1 is "help":
-			message "{@P} /ss-convert <player from> <player to>"
-		else if arg 2 is not set:
-			message "{@P} Invalid arguments"
-		else if arg 1 is "delete":
-			delete {ss.%arg 2%.chests::*}
-			message "{@P} Deleted %arg 2%'s chests"
-		else:
-			message "{@P} Converting chests for: %arg 1% to %arg 2%"
-			loop {ss.%arg 1%.chests::*}:
-				add loop-value to {ss.%arg 2%.chests::*}
-				set {_loc} to loop-value
-				add 1 to y coord of {_loc}
-				set line 1 of block at {_loc} to "%arg 2%"
-			delete {ss.%arg 1%.chests::*}
+				message "{@P} You must provide a players name to delete"
+		else if arg 1 is "clearall"
+			if arg 2 is set:
+				set {_p} to arg 2 parsed as player
+				if {ss.%uuid of {_p}%.exists} is true:
+					if {ss.%uuid of {_p}%.chests::*} is not empty:
+						loop {ss.%{_p}%.chests::*}:
+							set {_loc} to loop-value
+							set block at {_loc} to air
+							add 1 to y coord of {_loc}
+							set block at {_loc} to air
+							add 1 to {_num}
+						message "{@P} Cleared %{_p}%'s shops (%{_num}%/%size of %{ss.%{_p}%.chests::*}%)"
+						delete {ss.%{_p}%.chests::*}
+					else:
+						message "{@P} %{_p}% has no shops"
+				else:
+					message "{@P} That user doesn't have exist"
+			else:
+				message "{@P} You must provide a players name to clear"
+		else if arg 1 is "convert":
+			if arg 2 is set:
+				if arg 3 is set:
+					message "{@P} Converting chests for: %arg 2% to %arg 3%"
+					loop {ss.%arg 2%.chests::*}:
+						add loop-value to {ss.%arg 3%.chests::*}
+						set {_loc} to loop-value
+						add 1 to y coord of {_loc}
+						set line 1 of block at {_loc} to "%arg 3%"
+						add 1 to {_num}
+					message "{@P} Successfully converted chests from %arg 2% to %arg 3% (%{_num}%/%size of {ss.%arg 2%.chests::*}%/%size of {ss.%arg 3%.chests::*}%)"
+					delete {ss.%arg 2%.chests::*}
 			
 		   
 command /shopsearch <text> [<integer>] [<item>]:
