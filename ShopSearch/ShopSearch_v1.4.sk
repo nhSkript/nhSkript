@@ -239,7 +239,7 @@ on rightclick on chest:
 	else if {ss.%uuid of player%.remove} is true:
 		loop blocks 1 above block:
 			if loop-block is sign:
-				line 1 of loop-block is "%player%":
+				line 1 of loop-block is "%player%" or "[Chest Shop]":
 					set {_x} to x coordinate of block
 					set {_y} to y coordinate of block
 					set {_z} to z coordinate of block
