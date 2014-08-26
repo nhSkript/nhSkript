@@ -178,14 +178,17 @@ command /shopsearch <text> [<integer>] [<item>]:
 										if line 3 of block at {_cloc} is set:
 											if line 4 of block at {_cloc} is set:
 												set {_line3} to line 3 of block at {_cloc}
+												set {_playerto} to line 1 of block at {_cloc} parsed as text
 												if line 3 of block at {_cloc} contains "B" or "S" or ":" or " ":
 													set {_txt} to line 4 of block at {_loc}
 													replace all "B" and "S" and " " in {_txt} with ""
 													set {_txt::*} to {_txt} split at ":"
 													set {_line3} to {_txt::1}
+												if line 1 of block at {_cloc} = "[Chest Shop]":
+													if {McCS.Owner.%{_cloc}%} is set:
+														set {_playerto} to {McCS.Owner.%{_cloc}%}
 												set {_wamount} to arg-2
 												set {_witem} to arg-3
-												set {_playerto} to line 1 of block at {_cloc} parsed as text
 												set {_amount} to line 2 of block at {_cloc} parsed as number
 												set {_price} to {_line3} parsed as number
 												set {_itemname} to line 4 of block at {_cloc} parsed as text
@@ -215,9 +218,10 @@ command /shopsearch <text> [<integer>] [<item>]:
 			message "{@P} Unknown command!"
 on rightclick on chest:
 	if {ss.%uuid of player%.add} is true:
-		loop blocks 1 above block:
-			if loop-block is sign:
-				line 1 of loop-block is "%player%":
+		set {_loc} to location of event-block
+		add 1 to {_loc}
+			if block at {_loc} is sign:
+				line 1 of block at {_loc} is "%player%" or "[Chest Shop]":
 					set {_x} to x coordinate of block
 					set {_y} to y coordinate of block
 					set {_z} to z coordinate of block
