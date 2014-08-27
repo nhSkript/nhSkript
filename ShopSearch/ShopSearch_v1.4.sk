@@ -4,6 +4,7 @@ options:
 	uMyC: [MyC] # MyConomy logging prefix
 	# Curreny related stuff #
 	B-C: true # Symbol before. Example: $1000. Set to false for: 1000$
+	QucikShop: false # If true when a user creates a shop they will be given a code which a user can do /ss quickshop <code>. REQUIRES CODEGENAPI!
 	# To change the currency symbol just change the £ sign below to whatever.
 	
 on script load:
