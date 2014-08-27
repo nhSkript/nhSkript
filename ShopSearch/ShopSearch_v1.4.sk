@@ -3,8 +3,11 @@ options:
 	MyC: &6[&eMyC&6]&e # MyConomy Prefix
 	uMyC: [MyC] # MyConomy logging prefix
 	# Curreny related stuff #
-	B-C: true   # Symbol before. Example: $1000. Set to false for: 1000$
-	Currency: $ # Currency symbol.
+	B-C: true # Symbol before. Example: $1000. Set to false for: 1000$
+	# To change the currency symbol just change the £ sign below to whatever.
+	
+on script load:
+	set {ss.currency} to "£" # Currency symbol.
 	   
 on join:
 	if {ss.%uuid of player%.exists} is not set:
@@ -104,13 +107,23 @@ command /shopsearch [<text>] [<text>] [<item>]:
 			if arg 2 is "shops":
 				loop {ss.playerlist::*}:
 					add size of {ss.%loop-value%.chests::*} to {_count}
+				if {_count} is not set:
+					set {_count} to 0
 				message "{@P} There are currently: %{_count}% shops!"
 			else if arg 2 is "money":
+				if {ss.totalmoney} is not set:
+					set {ss.totalmoney} to 0
 				if {@B-C} is true:
-					message "{@P} A total of: {@Currency} %{ss.totalmoney}% has been sent using ShopSearch"
+					message "{@P} A total of: %{ss.currency}%%{ss.totalmoney}% has been sent using ShopSearch"
 				else:
-					message "{@P} A total of: %{ss.totalmoney}%{@Currency} has been sent using ShopSearch"
+					message "{@P} A total of: %{ss.totalmoney}%%{ss.currency}% has been sent using ShopSearch"
 			else if arg 2 is "items":
+				if {ss.itemlist-itm::*} is empty:
+					message "{@P} There are no top selling items."
+					stop
+				else if {ss.itemlist-itm::*} is not set:
+					message "{@P} There are no top selling items."
+					stop
 				message "{@P} Top selling items:"
 				loop {ss.itemlist-itm::*}:
 					add 1 to {_num}
@@ -201,7 +214,7 @@ command /shopsearch [<text>] [<text>] [<item>]:
 				loop {ss.%arg 1%.chests::*}:
 					add 1 to {_counter}
 					if block at loop-value is chest:
-						if block at loop-value contains _number-of-items of arg-3:
+						if block at loop-value contains {_number-of-items} of arg-3:
 							set {_x} to x coordinate of loop-value
 							set {_y} to y coordinate of loop-value
 							set {_z} to z coordinate of loop-value
