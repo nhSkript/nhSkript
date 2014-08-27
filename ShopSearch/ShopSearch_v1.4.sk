@@ -1,10 +1,10 @@
 options:
-	P: &8[&aSS&8]&a     # ShopSearch prefix
-	MyC: &6[&eMyC&6]&e  # MyConomy Prefix
-	uMyC: [MyC]         # MyConomy logging prefix
+	P: &8[&aSS&8]&a # ShopSearch prefix
+	MyC: &6[&eMyC&6]&e # MyConomy Prefix
+	uMyC: [MyC] # MyConomy logging prefix
 	# Curreny related stuff #
-	B-C: true           # Symbol before. Example: $1000. Set to false for: 1000$
-	C: $                # Currency symbol.
+	B-C: true   # Symbol before. Example: $1000. Set to false for: 1000$
+	Currency: $ # Currency symbol.
 	   
 on join:
 	if {ss.%uuid of player%.exists} is not set:
@@ -12,7 +12,7 @@ on join:
 		set {ss.%uuid of player%.buying} to false
 	if {ss.%uuid of player%.lastplayer} is not set:
 		set {ss.%uuid of player%.lastplayer} to player
-	if (ss.playerlist::%player%} is not set:
+	if {ss.playerlist::%player%} is not set:
 		set {ss.playerlist::%player%} to player
 	else if {ss.%uuid of player%.lastplayer} is not player:
 		set {_p} to {ss.%uuid of player%.lastplayer} parsed as player
@@ -34,21 +34,24 @@ every 10 seconds:
 			loop-player has permission "ss.admin":
 				send "{@P} ShopSearch is not on the latest version! your version &61.0&a. The new version is &6%{ss.version}%&a." to loop-player
 				
-command /ss-admin <text> [<text>]:
+command /ss-admin [<text>] [<text>] [<text>]:
 	description: SearchShop Admin
 	permission: shopsearch.admin
 	trigger:
+		if arg 1 is not set:
+			message "{@P} Do /ss-admin help - for help"
 		if arg 1 is "help":
 			message "{@P} ShopSearch admin command help"
-			message "{@P} /ss-admin delete <user> - Deletes a users added shops
+			message "{@P} /ss-admin delete <user> - Deletes a users added shops"
 			message "{@P} /ss-admin clearall <user> - Removes the users added shops AND the chest/sign block"
 			message "{@P} /ss-admin convert <user from> <user to> - Converts a chest of a user to another"
 		else if arg 1 is "delete":
 			if arg 2 is set:
 				set {_p} to arg 2 parsed as player
-				if {ss.%uuid of {_p}%.exists} is true:
+				set {_uuid} to uuid of {_p}
+				if {ss.%{_uuid}%.exists} is true:
 					if {ss.%{_p}%.chests::*} is not empty:
-						message "{@P} Deleted %{_p}%'s shops (%size of {ss.%{_p}%.chests::*}"
+						message "{@P} Deleted %{_p}%'s shops (%size of {ss.%{_p}%.chests::*}%)"
 						delete {ss.%{_p}%.chests::*}
 					else:
 						message "{@P} %{_p}% has no shops"
@@ -56,18 +59,19 @@ command /ss-admin <text> [<text>]:
 					message "{@P} That user doesn't have exist"
 			else:
 				message "{@P} You must provide a players name to delete"
-		else if arg 1 is "clearall"
+		else if arg 1 is "clearall":
 			if arg 2 is set:
 				set {_p} to arg 2 parsed as player
-				if {ss.%uuid of {_p}%.exists} is true:
-					if {ss.%uuid of {_p}%.chests::*} is not empty:
+				set {_uuid} to uuid of {_p}
+				if {ss.%{_uuid}%.exists} is true:
+					if {ss.%{_uuid}%.chests::*} is not empty:
 						loop {ss.%{_p}%.chests::*}:
 							set {_loc} to loop-value
 							set block at {_loc} to air
 							add 1 to y coord of {_loc}
 							set block at {_loc} to air
 							add 1 to {_num}
-						message "{@P} Cleared %{_p}%'s shops (%{_num}%/%size of %{ss.%{_p}%.chests::*}%)"
+						message "{@P} Cleared %{_p}%'s shops (%{_num}%/%size of {ss.%{_p}%.chests::*}%)"
 						delete {ss.%{_p}%.chests::*}
 					else:
 						message "{@P} %{_p}% has no shops"
@@ -89,7 +93,7 @@ command /ss-admin <text> [<text>]:
 					delete {ss.%arg 2%.chests::*}
 			
 		   
-command /shopsearch <text> [<integer>] [<item>]:
+command /shopsearch [<text>] [<text>] [<item>]:
 	description: Main ShopSearch command
 	permission: shopsearch.usage
 	aliases: /ss, /searchs, /sshop,
@@ -103,9 +107,9 @@ command /shopsearch <text> [<integer>] [<item>]:
 				message "{@P} There are currently: %{_count}% shops!"
 			else if arg 2 is "money":
 				if {@B-C} is true:
-					message "{@P} A total of: {@C}%{ss.totalmoney}% has been sent using ShopSearch"
+					message "{@P} A total of: {@Currency} %{ss.totalmoney}% has been sent using ShopSearch"
 				else:
-					message "{@P} A total of: %{ss.totalmoney}%{@C} has been sent using ShopSearch"
+					message "{@P} A total of: %{ss.totalmoney}%{@Currency} has been sent using ShopSearch"
 			else if arg 2 is "items":
 				message "{@P} Top selling items:"
 				loop {ss.itemlist-itm::*}:
@@ -146,6 +150,7 @@ command /shopsearch <text> [<integer>] [<item>]:
 		else if arg 1 is "confirm":
 			if {ss.%uuid of player%.buying} is true:
 				if block at {ss.%uuid of player%.buying.chestloc} contains {ss.%uuid of player%.buying.amount} of {ss.%uuid of player%.buying.item}:
+					set {_number-of-items} to arg 2 parsed as number
 					if {myc.enabled} is true:
 						execute op command "/myc-transaction normal ShopSearch %player% %{ss.%uuid of player%.buying.playerto}% %{ss.%uuid of player%.buying.price}%"
 						if {myc.%uuid of player%.tcomplete} is true:
@@ -165,11 +170,11 @@ command /shopsearch <text> [<integer>] [<item>]:
 							message "{@P} Transaction failed. Please try again."
 					else:
 						if player's balance is greater than or equal to {_price}:
-							remove arg-2 of arg-3 from block at loop-value
-							give arg-2 of arg-3 to player
+							remove {_number-of-items} of arg-3 from block at loop-value
+							give {_number-of-items} of arg-3 to player
 							subtract {ss.%uuid of player%.buying.price} from player's balance
 							add {ss.%uuid of player%.buying.price} to {ss.%uuid of player%.buying.playerto}'s balance
-							message "{@P} You just bought %arg-2% %arg-3% from %{_playerto}% for %{_price}%"
+							message "{@P} You just bought %{_number-of-items}% %arg-3% from %{_playerto}% for %{_price}%"
 							set {ss.%uuid of player%.buying} to false
 							delete {ss.%uuid of player%.buying.chestloc}
 							delete {ss.%uuid of player%.buying.item}
@@ -188,6 +193,7 @@ command /shopsearch <text> [<integer>] [<item>]:
 			else if arg 2 is not number:
 				message "{@P} You must enter the amount as a number!"
 			else:
+				set {_number-of-items} to arg 2 parsed as number
 				if {ss.%arg 1%.chests::*} is empty:
 					message "{@P} %arg 1% has no shops"
 					stop
@@ -195,7 +201,7 @@ command /shopsearch <text> [<integer>] [<item>]:
 				loop {ss.%arg 1%.chests::*}:
 					add 1 to {_counter}
 					if block at loop-value is chest:
-						if block at loop-value contains arg-2 of arg-3:
+						if block at loop-value contains _number-of-items of arg-3:
 							set {_x} to x coordinate of loop-value
 							set {_y} to y coordinate of loop-value
 							set {_z} to z coordinate of loop-value
@@ -216,7 +222,7 @@ command /shopsearch <text> [<integer>] [<item>]:
 												if line 1 of block at {_cloc} = "[Chest Shop]":
 													if {McCS.Owner.%{_cloc}%} is set:
 														set {_playerto} to {McCS.Owner.%{_cloc}%}
-												set {_wamount} to arg-2
+												set {_wamount} to {_number-of-items}
 												set {_witem} to arg-3
 												set {_amount} to line 2 of block at {_cloc} parsed as number
 												set {_price} to {_line3} parsed as number
@@ -249,22 +255,22 @@ on rightclick on chest:
 	if {ss.%uuid of player%.add} is true:
 		set {_loc} to location of event-block
 		add 1 to {_loc}
-			if block at {_loc} is sign:
-				line 1 of block at {_loc} is "%player%" or "[Chest Shop]":
-					set {_x} to x coordinate of block
-					set {_y} to y coordinate of block
-					set {_z} to z coordinate of block
-					set {_ss.x} to floor({_x})
-					set {_ss.y} to floor({_y})
-					set {_ss.z} to floor({_z})
-					set {_ss.cloc} to location at {_ss.x}, {_ss.y}, {_ss.z}
-					add {_ss.cloc} to {ss.%player%.chests::*}
-					message "{@P} Added: %{_ss.cloc}%"
-					cancel event
-					set {ss.%uuid of player%.add} to false
-				else:
-					message "{@P} It needs to be your shop!"
-					cancel event
+		if block at {_loc} is sign:
+			line 1 of block at {_loc} is "%player%" or "[Chest Shop]":
+				set {_x} to x coordinate of block
+				set {_y} to y coordinate of block
+				set {_z} to z coordinate of block
+				set {_ss.x} to floor({_x})
+				set {_ss.y} to floor({_y})
+				set {_ss.z} to floor({_z})
+				set {_ss.cloc} to location at {_ss.x}, {_ss.y}, {_ss.z}
+				add {_ss.cloc} to {ss.%player%.chests::*}
+				message "{@P} Added: %{_ss.cloc}%"
+				cancel event
+				set {ss.%uuid of player%.add} to false
+			else:
+				message "{@P} It needs to be your shop!"
+				cancel event
 	else if {ss.%uuid of player%.remove} is true:
 		loop blocks 1 above block:
 			if loop-block is sign:
