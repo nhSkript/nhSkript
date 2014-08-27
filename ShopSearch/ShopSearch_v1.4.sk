@@ -137,6 +137,26 @@ command /shopsearch [<text>] [<text>] [<item>]:
 							set {_output-list::%{_num}%} to "%loop-value% - %{ss.itemlist-num::%loop-value%}%"
 				loop {_output-list::*}:
 					message "{@P} %loop-value%"
+			else if arg 2 is "users":
+				if {ss.playersales-p::*} is empty:
+					message "{@P} There are no top selling players."
+					stop
+				else if {ss.playersales-n::*} is not set:
+					message "{@P} There are no top selling players."
+					stop
+				message "{@P} Top selling players:"
+				loop {ss.playersales-p::*}:
+					add 1 to {_num}
+					set {_item-%{_num}%} to {ss.playersales-p::%loop-value%}
+					if {_num} = 10:
+						exit
+				loop {ss.playersales-p::*}:
+					loop 10 times:
+						add 1 to {_cou}
+						if {ss.playersales-n::%loop-value%} > {_item-%{_num}%}:
+							set {_output-list::%{_num}%} to "%loop-value% - %{ss.playersales-n::%loop-value%}%"
+				loop {_output-list::*}:
+					message "{@P} %loop-value%"
 		else if arg 1 is "add":
 			message "{@P} Right click to add a chest!"
 			set {ss.%uuid of player%.add} to true
@@ -178,6 +198,11 @@ command /shopsearch [<text>] [<text>] [<item>]:
 								set {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%} to 1
 							else:
 								add 1 to {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%}
+							if {ss.playersales-p::%{ss.%uuid of player%.buying.playerto}%} is not set:
+								set {ss.playersales-p::%{ss.%uuid of player%.buying.playerto}%} to {ss.%uuid of player%.buying.playerto}
+								set {ss.playersales-n::%{ss.%uuid of player%.buying.playerto}%} to 1
+							else:
+								add 1 to {ss.playersales-n::%{ss.%uuid of player%.buying.playerto}%}
 							set {ss.%uuid of player%.buying} to false
 							delete {ss.%uuid of player%.buying.chestloc}
 							delete {ss.%uuid of player%.buying.item}
@@ -193,6 +218,11 @@ command /shopsearch [<text>] [<text>] [<item>]:
 								set {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%} to 1
 							else:
 								add 1 to {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%}
+							if {ss.playersales-p::%{ss.%uuid of player%.buying.playerto}%} is not set:
+								set {ss.playersales-p::%{ss.%uuid of player%.buying.playerto}%} to {ss.%uuid of player%.buying.playerto}
+								set {ss.playersales-n::%{ss.%uuid of player%.buying.playerto}%} to 1
+							else:
+								add 1 to {ss.playersales-n::%{ss.%uuid of player%.buying.playerto}%}
 							remove {_number-of-items} of arg-3 from block at loop-value
 							give {_number-of-items} of arg-3 to player
 							subtract {ss.%uuid of player%.buying.price} from player's balance
