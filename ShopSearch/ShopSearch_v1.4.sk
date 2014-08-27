@@ -173,6 +173,11 @@ command /shopsearch [<text>] [<text>] [<item>]:
 							subtract {ss.%uuid of player%.buying.price} from {myc.%uuid of player%.money}
 							add {ss.%uuid of player%.buying.price} to {myc.%{ss.%uuid of player%.buying.playerto}%.money}
 							message "{@P} You bought: %{ss.%uuid of player%.buying.amount}% %{ss.%uuid of player%.buying.item}%"
+							if {ss.itemlist-itm::%{ss.%uuid of player%.buying.item}%} is not set:
+								set {ss.itemlist-itm::%{ss.%uuid of player%.buying.item}%} to {ss.%uuid of player%.buying.item}
+								set {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%} to 1
+							else:
+								add 1 to {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%}
 							set {ss.%uuid of player%.buying} to false
 							delete {ss.%uuid of player%.buying.chestloc}
 							delete {ss.%uuid of player%.buying.item}
@@ -183,6 +188,11 @@ command /shopsearch [<text>] [<text>] [<item>]:
 							message "{@P} Transaction failed. Please try again."
 					else:
 						if player's balance is greater than or equal to {_price}:
+							if {ss.itemlist-itm::%{ss.%uuid of player%.buying.item}%} is not set:
+								set {ss.itemlist-itm::%{ss.%uuid of player%.buying.item}%} to {ss.%uuid of player%.buying.item}
+								set {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%} to 1
+							else:
+								add 1 to {ss.itemlist-num::%{ss.%uuid of player%.buying.item}%}
 							remove {_number-of-items} of arg-3 from block at loop-value
 							give {_number-of-items} of arg-3 to player
 							subtract {ss.%uuid of player%.buying.price} from player's balance
