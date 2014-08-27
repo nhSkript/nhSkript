@@ -8,6 +8,11 @@ options:
 	
 on script load:
 	set {ss.currency} to "£" # Currency symbol.
+	wait 1 second
+	if {ss.codegenapi.key} is not set:
+		if {cga.max} is set:
+			execute console command "/codegenapi g k shopsearch"
+			set {ss.codegenapi.key} to {cga.shopsearch.code}
 	   
 on join:
 	if {ss.%uuid of player%.exists} is not set:
@@ -329,6 +334,13 @@ on rightclick on chest:
 				message "{@P} Added: %{_ss.cloc}%"
 				cancel event
 				set {ss.%uuid of player%.add} to false
+				if {ss.codegenapi.key} is set:
+					if {@QucikShop} is true:
+						execute console command "/codegenapi g c %{ss.codegenapi.key}% %player% 4"
+						set {_c} to {cga.%{ss.codegenapi.key}%.%player%.code}
+						set {ss.quickshop.%location of event-block%} to {_c}
+						set {ss.quickshop.%{_c}%} to location of event-block
+						message "{@P} Users can do /ss quickshop %{_c}% - to quickly buy from this shop"
 			else:
 				message "{@P} It needs to be your shop!"
 				cancel event
@@ -347,6 +359,10 @@ on rightclick on chest:
 					message "{@P} Removed: %{_ss.cloc}%"
 					cancel event
 					set {ss.%uuid of player%.remove} to false
+					if {ss.quickshop.%location of event-block%} is set:
+						set {_c} to {ss.quickshop.%location of event-block%}
+						delete {ss.quickshop.%location of event-block%}
+						delete {ss.quickshop.%{_c}%}
 				else:
 					message "{@P} It needs to be your shop!"
 					cancel event
