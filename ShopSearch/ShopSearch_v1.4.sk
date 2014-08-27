@@ -108,6 +108,20 @@ command /shopsearch [<text>] [<text>] [<item>]:
 	trigger:
 		if arg 1 is not set:
 			message "{@P} You must give a subcommand!"
+		else if arg 1 is "quickshop":
+			if arg 2 is set:
+				if {ss.quickshop.%{_c}%} is set:
+					set {_c} to arg 2
+					set {_loc} to {ss.quickshop.%{_c}%}
+					add 1 to y coord of {_loc}
+					set {ss.%uuid of player%.buying.chestloc} to {ss.quickshop.%{_c}%}
+					set {ss.%uuid of player%.buying.playerto} to {ss.quickshop.details.%{_c}%::playerto}
+					set {ss.%uuid of player%.buying.amount} to {ss.quickshop.details.%{_c}%::amount}
+					set {ss.%uuid of player%.buying.price} to {ss.quickshop.details.%{_c}%::price}
+					set {ss.%uuid of player%.buying.item} to {ss.quickshop.details.%{_c}%::item}
+					set {ss.%uuid of player%.buying} to true
+					message "{@P} We have prepared your QuickShop!"
+					make player execute command "/ss buy"
 		else if arg 1 is "stats":
 			if arg 2 is "help":
 				message "{@P} Stats help:"
@@ -189,6 +203,7 @@ command /shopsearch [<text>] [<text>] [<item>]:
 				else:
 					message "{@P} Price: %{ss.%uuid of player%.buying.price}%"
 				message "{@P} From Player: %{ss.%uuid of player%.buying.playerto}%"
+				message "{@P} To confirm your purchase please do: /ss confirm"
 			else:
 				message "{@P} Something went wrong..."
 		else if arg 1 is "confirm":
@@ -339,7 +354,14 @@ on rightclick on chest:
 						execute console command "/codegenapi g c %{ss.codegenapi.key}% %player% 4"
 						set {_c} to {cga.%{ss.codegenapi.key}%.%player%.code}
 						set {ss.quickshop.%location of event-block%} to {_c}
-						set {ss.quickshop.%{_c}%} to location of event-block
+						set {ss.quickshop.details.%{_c}%} to location of event-block
+						set {ss.quickshop.details.%{_c}%::playerto} to player
+						set {ss.quickshop.details.%{_c}%::amount} to line 2 of block at {_loc}
+						set {_pric::*} to line 3 of block at {_loc} split at ":"
+						set {_price} to {_pric::1}
+						replace all "B" and " " in {_price} with ""
+						set {ss.quickshop.details.%{_c}%::price} to {_price}
+						set {ss.quickshop.details.%{_c}%::item} to line 4 of block at {_loc}
 						message "{@P} Users can do /ss quickshop %{_c}% - to quickly buy from this shop"
 			else:
 				message "{@P} It needs to be your shop!"
@@ -361,6 +383,7 @@ on rightclick on chest:
 					set {ss.%uuid of player%.remove} to false
 					if {ss.quickshop.%location of event-block%} is set:
 						set {_c} to {ss.quickshop.%location of event-block%}
+						delete {ss.quickshop.details.%{_c}%::*}
 						delete {ss.quickshop.%location of event-block%}
 						delete {ss.quickshop.%{_c}%}
 				else:
