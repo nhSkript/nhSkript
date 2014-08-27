@@ -99,7 +99,7 @@ command /shopsearch <text> [<integer>] [<item>]:
 		else if arg 1 is "stats":
 			if arg 2 is "shops":
 				loop {ss.playerlist::*}:
-					add size of {ss.%player%.chests::*} to {_count}
+					add size of {ss.%loop-value%.chests::*} to {_count}
 				message "{@P} There are currently: %{_count}% shops!"
 			else if arg 2 is "money":
 				if {@B-C} is true:
@@ -107,7 +107,19 @@ command /shopsearch <text> [<integer>] [<item>]:
 				else:
 					message "{@P} A total of: %{ss.totalmoney}%{@C} has been sent using ShopSearch"
 			else if arg 2 is "items":
-				# Coming soon
+				message "{@P} Top selling items:"
+				loop {ss.itemlist-itm::*}:
+					add 1 to {_num}
+					set {_item-%{_num}%} to {ss.itemlist-num::%loop-value%}
+					if {_num} = 10:
+						exit
+				loop {ss.itemlist-itm::*}:
+					loop 10 times:
+						add 1 to {_cou}
+						if {ss.itemlist-num::%loop-value%} > {_item-%{_num}%}:
+							set {_output-list::%{_num}%} to "%loop-value% - %{ss.itemlist-num::%loop-value%}%"
+				loop {_output-list::*}:
+					message "{@P} %loop-value%"
 		else if arg 1 is "add":
 			message "{@P} Right click to add a chest!"
 			set {ss.%uuid of player%.add} to true
