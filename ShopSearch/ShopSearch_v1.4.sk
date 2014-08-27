@@ -109,6 +109,26 @@ command /shopsearch [<text>] [<text>] [<item>]:
 	trigger:
 		if arg 1 is not set:
 			message "{@P} You must give a subcommand!"
+		else if arg 1 is "menu":
+			if arg 2 is set:
+				set {_p} to arg 2 parsed as player
+				set {_u} to uuid of {_p}
+				set {_size} to rounded up size of {ss.%{_p}%.chests::*} / 9
+				open chest with {_size} rows named "&aShop of: %{_p}%" to player
+				wait 1 tick
+				set {_num} to 0
+				loop {ss.%{_p}%.chests::*}:
+					add 1 to {_num}
+					set {_loc} to loop-value
+					add 1 to y coord of {_loc}
+					set {_b} to block at {_loc}
+					set {_i} to line 4 of {_b} parsed as item
+					if line 1 of {_b} is "[Chest Shop]":
+						message "1"
+						format slot {_num} of player with {_i} named "" with lore "Player to: %{McCS.Owner.%{_loc}%}%||Amount: %line 2 of {_b}%||Price: %line 3 of {_b}%||Item: %line 4 of {_b}%" to close
+					else:
+						message "2"
+						format slot {_num} of player with {_i} named "" with lore "Player to: %line 1 of {_b}%||Amount: %line 2 of {_b}%||Price: %line 3 of {_b}%||Item: %line 4 of {_b}%" to close
 		else if arg 1 is "quickshop":
 			if arg 2 is set:
 				if {ss.quickshop.%{_c}%} is set:
@@ -335,10 +355,9 @@ command /shopsearch [<text>] [<text>] [<item>]:
 			message "{@P} Unknown command!"
 on rightclick on chest:
 	if {ss.%uuid of player%.add} is true:
-		set {_loc} to location of event-block
-		add 1 to {_loc}
-		if block at {_loc} is sign:
-			line 1 of block at {_loc} is "%player%" or "[Chest Shop]":
+		set {_b} to block above event-block
+		if {_b} is sign:
+			line 1 of {_b} is "%player%" or "[Chest Shop]":
 				set {_x} to x coordinate of block
 				set {_y} to y coordinate of block
 				set {_z} to z coordinate of block
@@ -351,23 +370,24 @@ on rightclick on chest:
 				cancel event
 				set {ss.%uuid of player%.add} to false
 				if {ss.codegenapi.key} is set:
-					if {@QucikShop} is true:
+					if {@QuickShop} is true:
 						execute console command "/codegenapi g c %{ss.codegenapi.key}% %player% 4"
 						set {_c} to {cga.%{ss.codegenapi.key}%.%player%.code}
 						set {ss.quickshop.%location of event-block%} to {_c}
 						set {ss.quickshop.details.%{_c}%} to location of event-block
 						set {ss.quickshop.details.%{_c}%::playerto} to player
-						set {ss.quickshop.details.%{_c}%::amount} to line 2 of block at {_loc}
-						set {_pric::*} to line 3 of block at {_loc} split at ":"
+						set {ss.quickshop.details.%{_c}%::amount} to line 2 of {_b} parsed as text
+						set {_pric::*} to line 3 of {_b} split at ":"
 						set {_price} to {_pric::1}
 						replace all "B" and " " in {_price} with ""
 						set {ss.quickshop.details.%{_c}%::price} to {_price}
-						set {ss.quickshop.details.%{_c}%::item} to line 4 of block at {_loc}
+						set {ss.quickshop.details.%{_c}%::item} to line 4 of {_b} parsed as text
 						message "{@P} Users can do /ss quickshop %{_c}% - to quickly buy from this shop"
 			else:
 				message "{@P} It needs to be your shop!"
 				cancel event
 	else if {ss.%uuid of player%.remove} is true:
+		set {_b} to block above event-block
 		loop blocks 1 above block:
 			if loop-block is sign:
 				line 1 of loop-block is "%player%" or "[Chest Shop]":
