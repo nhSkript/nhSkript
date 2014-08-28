@@ -1,0 +1,112 @@
+# PayPoint - The simple economy script
+# By nfell2009 & HoneyBuzzard
+
+options:
+	P:&9
+	
+variables:
+	{pp::setting::currency} = "£" # Change to whatever currency you want
+	
+on join:
+	if {pp::player::%uuid of player%::exists} is not set:
+		if {pp::setting::onjoin} is true:
+			if {pp::setting::bank} is true:
+				set {pp::player::%uuid of player%::balance} to {myc.banks.personal::%player%} + {myc.%player%.balance}
+			else:
+				set {pp::player::%uuid of player%::balance} to {myc.%player%.balance}
+			set {pp::player::%uuid of player%::exists} to true
+			set {pp::lists::players::%player%} to player
+		else:
+			set {pp::player::%uuid of player%::exists} to true
+			set {pp::player::%uuid of player%::balance} to 0
+			set {pp::lists::players::%uuid of player%} to player
+	
+		
+
+command /paypoint [<text>] [<text>] [<text>]:
+	aliases: /pp,
+	trigger:
+		if arg 1 is not set:
+			message "{@P} Do /pp help - for help"
+		else if arg 1 is "help":
+			message "{@P} /pp convert help - How to convert from MyConomy to PayPoint"
+			message "{@P} /pp convert info - Info about the converter"
+		else if arg 1 is "convert":
+			if player doesn't have permission "paypoint.admin":
+				message "{@P} You don't have permission to do that"
+				stop
+			if arg 2 is "help":
+				message "{@P} To convert from MyConomy to PayPoint you must do the following:  (t = yes - f = no)"
+				message "{@P} /pp convert currency <t|f> - Should the currency from MyConomy be transfered"
+				message "{@P} /pp convert onjoin <t|f> - When users join should they get their balance from MyConomy"
+				message "{@P} /pp convert bank <t|f> - If you set onjoin to true should users get money from their MyConomy bank"
+				message "{@P} Once done, enter: /pp convert myc - to begin the conversion. If any setting is unset it will be stop the conversion"
+				message "{@P} For more info about the converter /pp convert info"
+			else if arg 2 is "currency":
+				if arg 3 is "t" or "true":
+					set {pp::converter::currency} to true
+				else:
+					set {pp::converter::currency} to false
+				message "{@P} You set currency conversion to: %{pp::converter::currency}%"
+			else if arg 2 is "onjoin":
+				if arg 3 is "t" or "true":
+					set {pp::converter::onjoin} to true
+				else:
+					set {pp::converter::onjoin} to false
+				message "{@P} You set onjoin conversion to: %{pp::converter::onjoin}%"
+			else if arg 2 is "bank":
+				if arg 3 is "t" or "true":
+					set {pp::converter::bank} to true
+				else:
+					set {pp::converter::bank} to false
+				message "{@P} You set bank conversion to: %{pp::converter::bank}%"
+			else if arg 2 is "myc":
+				if {pp::converter::currency} is not set:
+					set {pp::converter::currency} to false
+					message "{@P} You must set the currency (do /pp convert help - for help)"
+					stop
+				else if {pp::converter::onjoin} is not set:
+					set {pp::converter::onjoin} to false
+					message "{@P} You must set the onjoin (do /pp convert help - for help)"
+					stop
+				else if {pp::converter::bank} is not set:
+					set {pp::converter::bank} to false
+					message "{@P} You must set the bank (do /pp convert help - for help)"
+					stop
+				message "{@P} Starting conversion..."
+				if {pp::converter::currency} is true:
+					set {pp::setting::currency} to {myc.currency}
+					message "{@P} Converted currency"
+				if {pp::converter::onjoin} is true:
+					set {pp::setting::onjoin} to true
+					message "{@P} Set onjoin conversion to true"
+				if {pp::converter::bank} is true:
+					set {pp::setting::bank} to true
+					message "{@P} Enabled bank conversion"
+				message "{@P} Conversion finished"
+			else if arg 2 is "info":
+				message "{@P} About PayPoint's converter:"
+				message "{@P} This converter allows you to retrieve a users balance from MyConomy. You may notice that the user balance is only set when the player joins, this is due to a limiation in how MyConomy was written as there is no list of players for PayPoint to access and convert. The tools provided by converter allow you to get the main parts from MyConomy. If you have any suggestions for the converter please tell us on Bukkit thread"
+			else:
+				message "{@P} Invalid command"
+					
+command /pay [<text>] [<text>]:
+	trigger:
+		set {_p} to arg 1 parsed as player
+		set {_a} to arg 2 parsed as number
+		set {_u} to uuid of {_p}
+		if {_a} is greater than {pp::player::%uuid of player%::balance}:
+			message "{@P} You don't have that much money to pay"
+			stop
+		else if {pp::player::%{_u}%::exists} is not set:
+			message "{@P} Player: %{_p}% doesn't exist"
+			stop
+		else:
+			subtract {_a} from {pp::player::%uuid of player%::balance}
+			add {_a} to {pp::player::%{_u}%::balance}
+			message "{@P} You paid: %{_a}% to %{_p}%"
+			
+command /balance:
+	aliases: /bal, /b, /money,
+	trigger:
+		message "{@P} Your balance is currently: %{pp::player::%uuid of player%::balance}%"
