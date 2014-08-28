@@ -147,18 +147,20 @@ command /shopsearch [<text>] [<text>] [<item>]:
 					set {_cloc} to location of block at loop-value
 					set {_b} to block at {_loc}
 					set {_i} to line 4 of {_b} parsed as item
-					if {ss.quickshop.%{_cloc}%} is set:
-						if line 1 of {_b} is "[Chest Shop]":
-							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss.quickshop.%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss.quickshop.%{_cloc}%}%"
+					set {_a} to line 2 of {_b} parsed as integer
+					if block at {_cloc} contains {_a} of {_i}:
+						if {ss.quickshop.%{_cloc}%} is set:
+							if line 1 of {_b} is "[Chest Shop]":
+								format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss.quickshop.%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss.quickshop.%{_cloc}%}%"
+							else:
+								format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss.quickshop.%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss.quickshop.%{_cloc}%}%"
 						else:
-							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss.quickshop.%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss.quickshop.%{_cloc}%}%"
+							if line 1 of {_b} is "[Chest Shop]":
+								format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
+							else:
+								format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
 					else:
-						if line 1 of {_b} is "[Chest Shop]":
-							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
-						else:
-							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
-					delete {_loc}
-					delete {_b}
+						format slot {_num} of player with {_i} named "&4Out of stock" with lore "&4Unfortunately this item is currently out of stock" to be unstealable
 		else if arg 1 is "quickshop":
 			if arg 2 is set:
 				if {ss.quickshop.%arg 2%} is set:
