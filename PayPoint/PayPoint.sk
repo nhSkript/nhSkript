@@ -7,12 +7,6 @@ options:
 variables:
 	{pp::setting::currency} = "£" # Change to whatever currency you want
 	
-on script load:
-	set {pp::setting::running} to true
-	
-on script stop:
-	set {pp::setting::running} to false
-	
 on join:
 	if {pp::player::%uuid of player%::exists} is not set:
 		if {pp::setting::onjoin} is true:
@@ -42,12 +36,12 @@ command /paypoint [<text>] [<text>] [<text>]:
 				message "{@P} You don't have permission to do that"
 				stop
 			if arg 2 is "help":
-				message "{@P} To convert from MyConomy to PayPoint you must do the following:  (t = yes - f = no)"
-				message "{@P} /pp convert currency <t|f> - Should the currency from MyConomy be transfered"
-				message "{@P} /pp convert onjoin <t|f> - When users join should they get their balance from MyConomy"
-				message "{@P} /pp convert bank <t|f> - If you set onjoin to true should users get money from their MyConomy bank"
-				message "{@P} Once done, enter: /pp convert myc - to begin the conversion. If any setting is unset it will be stop the conversion"
-				message "{@P} For more info about the converter /pp convert info"
+				message "{@P} To convert from MyConomy to PayPoint, you must type the following:  (t = yes - f = no)"
+				message "{@P} /pp convert currency <t|f> - Should the currency from MyConomy be transferred?"
+				message "{@P} /pp convert onjoin <t|f> - When users join should they get their balance from MyConomy?"
+				message "{@P} /pp convert bank <t|f> - If you set on join to true should users get money from their MyConomy banks?"
+				message "{@P} Once done, enter: /pp convert myc to begin the conversion. If any setting is unset it will be stop the conversion."
+				message "{@P} For more information about the converter, type /pp convert info."
 			else if arg 2 is "currency":
 				if arg 3 is "t" or "true":
 					set {pp::converter::currency} to true
@@ -85,14 +79,14 @@ command /paypoint [<text>] [<text>] [<text>]:
 					message "{@P} Converted currency"
 				if {pp::converter::onjoin} is true:
 					set {pp::setting::onjoin} to true
-					message "{@P} Set onjoin conversion to true"
+					message "{@P} Set on join conversion to true"
 				if {pp::converter::bank} is true:
 					set {pp::setting::bank} to true
 					message "{@P} Enabled bank conversion"
-				message "{@P} Conversion finished"
+				message "{@P} Conversion complete."
 			else if arg 2 is "info":
 				message "{@P} About PayPoint's converter:"
-				message "{@P} This converter allows you to retrieve a users balance from MyConomy. You may notice that the user balance is only set when the player joins, this is due to a limiation in how MyConomy was written as there is no list of players for PayPoint to access and convert. The tools provided by converter allow you to get the main parts from MyConomy. If you have any suggestions for the converter please tell us on Bukkit thread"
+				message "{@P} This converter allows you to retrieve a users balance from MyConomy. You may notice that the user balance is only set when the player joins; this is due to a limitation in how MyConomy was written. There is no list of players for PayPoint to access and convert. The tools provided by the converter allow you to get the main parts from MyConomy. If you have any suggestions for the converter, please tell us on the Bukkit thread."
 			else:
 				message "{@P} Invalid command"
 					
@@ -101,7 +95,7 @@ command /pay [<text>] [<text>]:
 		if arg 1 is "confirm":
 			if {pp::player::%uuid of player%::spay} is true:
 				if {pp::player::%uuid of player%::spay::amount} is greater than {pp::player::%uuid of player%::balance}:
-					message "{@P} You don't have that much money to pay"
+					message "{@P} You don't have that much money to spend!"
 					stop
 				else if {pp::player::%{pp::player::%uuid of player%::spay::to}%::exists} is not set:
 					message "{@P} Player: %{pp::player::%uuid of player%::spay::to}% doesn't exist"
@@ -111,7 +105,7 @@ command /pay [<text>] [<text>]:
 					add {pp::player::%uuid of player%::spay::amount} to {pp::player::%{pp::player::%uuid of player%::spay::to}%::balance}
 					message "{@P} You paid: %{pp::setting::currency}%%{pp::player::%uuid of player%::spay::amount}% to %{pp::player::%uuid of player%::spay::to}%"	
 			else:
-				message "{@P} You have nothing to confirm"
+				message "{@P} You have nothing to confirm!"
 		else:
 			set {_p} to arg 1 parsed as player
 			set {_a} to arg 2 parsed as number
