@@ -7,6 +7,13 @@ options:
 variables:
 	{pp::setting::currency} = "£" # Change to whatever currency you want
 	
+on script load:
+	set {pp::setting::running} to true
+	
+on script stop:
+	set {pp::setting::running} to false
+	
+	
 on join:
 	if {pp::player::%uuid of player%::exists} is not set:
 		if {pp::setting::onjoin} is true:
