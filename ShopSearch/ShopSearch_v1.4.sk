@@ -104,31 +104,30 @@ command /ss-admin [<text>] [<text>] [<text>]:
 		   
 command /shopsearch [<text>] [<text>] [<item>]:
 	description: Main ShopSearch command
-	permission: shopsearch.usage
+	#permission: shopsearch.usage
 	aliases: /ss, /searchs, /sshop,
 	trigger:
 		if arg 1 is not set:
 			message "{@P} You must give a subcommand!"
 		else if arg 1 is "menu":
 			if arg 2 is set:
-				set {_p} to arg 2 parsed as player
+				set {_p} to "%arg 2%" parsed as player
 				set {_u} to uuid of {_p}
 				set {_size} to rounded up size of {ss.%{_p}%.chests::*} / 9
 				open chest with {_size} rows named "&aShop of: %{_p}%" to player
 				wait 1 tick
-				set {_num} to 0
+				set {_num} to -3
 				loop {ss.%{_p}%.chests::*}:
 					add 1 to {_num}
-					set {_loc} to loop-value
-					add 1 to y coord of {_loc}
+					set {_loc} to location of block above block at loop-value
 					set {_b} to block at {_loc}
 					set {_i} to line 4 of {_b} parsed as item
 					if line 1 of {_b} is "[Chest Shop]":
-						message "1"
-						format slot {_num} of player with {_i} named "" with lore "Player to: %{McCS.Owner.%{_loc}%}%||Amount: %line 2 of {_b}%||Price: %line 3 of {_b}%||Item: %line 4 of {_b}%" to close
+						format slot {_num} of player with {_i} named "&aItem: %line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
 					else:
-						message "2"
-						format slot {_num} of player with {_i} named "" with lore "Player to: %line 1 of {_b}%||Amount: %line 2 of {_b}%||Price: %line 3 of {_b}%||Item: %line 4 of {_b}%" to close
+						format slot {_num} of player with {_i} named "&aItem: %line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
+					delete {_loc}
+					delete {_b}
 		else if arg 1 is "quickshop":
 			if arg 2 is set:
 				if {ss.quickshop.%{_c}%} is set:
@@ -292,8 +291,6 @@ command /shopsearch [<text>] [<text>] [<item>]:
 				message "{@P} You must enter an item amount you want!"
 			else if arg 3 is not set:
 				message "{@P} You must enter the item you want!"
-			else if arg 2 is not number:
-				message "{@P} You must enter the amount as a number!"
 			else:
 				set {_number-of-items} to arg 2 parsed as number
 				if {ss.%arg 1%.chests::*} is empty:
