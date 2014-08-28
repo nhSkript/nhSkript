@@ -104,13 +104,12 @@ command /ss-admin [<text>] [<text>] [<text>]:
 command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text>]:
 	executable by: console
 	trigger:
-		if arg 1 is "quickshop":
+		broadcast "watttt"
+		broadcast "%arg 1%"
+		if arg 1 is "menu":
 			set {_p} to arg 2 parsed as player
-			set {_c} to arg 3
-			make {_p} execute command "/ss quickshop %{_c}%"
-		else if arg 1 is "menu":
-			set {_p} to arg 2
 			set {_u} to uuid of {_p}
+			send "{@P} We're preparing your shopping experience..." to {_p}
 			set {ss.%{_u}%.buying.chestloc} to arg 7
 			set {ss.%{_u}%.buying.playerto} to arg 3
 			set {ss.%{_u}%.buying.amount} to arg 4
@@ -118,6 +117,13 @@ command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text
 			set {ss.%{_u}%.buying.item} to arg 6
 			set {ss.%{_u}%.buying} to true
 			make {_p} execute command "/ss buy"
+		else if arg 1 is "quickshop":
+			set {_p} to arg 2 parsed as player
+			set {_c} to arg 3
+			make {_p} execute command "/ss quickshop %{_c}%"
+		else:
+			set {_p} to arg 2 parsed as player
+			message "{@P} There was an error" to {_p}
 			
 		   
 command /shopsearch [<text>] [<text>] [<item>]:
