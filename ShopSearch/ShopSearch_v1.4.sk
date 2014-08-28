@@ -101,13 +101,23 @@ command /ss-admin [<text>] [<text>] [<text>]:
 					message "{@P} Successfully converted chests from %arg 2% to %arg 3% (%{_num}%/%size of {ss.%arg 2%.chests::*}%/%size of {ss.%arg 3%.chests::*}%)"
 					delete {ss.%arg 2%.chests::*}
 					
-command /ss-console [<text>] [<text>] [<text>]:
+command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text>]:
 	executable by: console
 	trigger:
 		if arg 1 is "quickshop":
 			set {_p} to arg 2 parsed as player
 			set {_c} to arg 3
 			make {_p} execute command "/ss quickshop %{_c}%"
+		else if arg 1 is "menu":
+			set {_p} to arg 2
+			set {_u} to uuid of {_p}
+			set {ss.%{_u}%.buying.chestloc} to arg 7
+			set {ss.%{_u}%.buying.playerto} to arg 3
+			set {ss.%{_u}%.buying.amount} to arg 4
+			set {ss.%{_u}%.buying.price} to arg 5
+			set {ss.%{_u}%.buying.item} to arg 6
+			set {ss.%{_u}%.buying} to true
+			make {_p} execute command "/ss buy"
 			
 		   
 command /shopsearch [<text>] [<text>] [<item>]:
@@ -138,9 +148,9 @@ command /shopsearch [<text>] [<text>] [<item>]:
 							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss.quickshop.%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss.quickshop.%{_cloc}%}%"
 					else:
 						if line 1 of {_b} is "[Chest Shop]":
-							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
+							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
 						else:
-							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
+							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
 					delete {_loc}
 					delete {_b}
 		else if arg 1 is "quickshop":
