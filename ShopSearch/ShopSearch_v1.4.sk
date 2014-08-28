@@ -48,12 +48,12 @@ command /ss-admin [<text>] [<text>] [<text>]:
 	permission: shopsearch.admin
 	trigger:
 		if arg 1 is not set:
-			message "{@P} Do /ss-admin help - for help"
+			message "{@P} Type /ss-admin help - for help"
 		if arg 1 is "help":
 			message "{@P} ShopSearch admin command help"
-			message "{@P} /ss-admin delete <user> - Deletes a users added shops"
-			message "{@P} /ss-admin clearall <user> - Removes the users added shops AND the chest/sign block"
-			message "{@P} /ss-admin convert <user from> <user to> - Converts a chest of a user to another"
+			message "{@P} /ss-admin delete <user> - Deletes a user's shops"
+			message "{@P} /ss-admin clearall <user> - Removes the users shops AND the chest/sign blocks"
+			message "{@P} /ss-admin convert <user from> <user to> - Converts a chest of a user to another's"
 		else if arg 1 is "delete":
 			if arg 2 is set:
 				set {_p} to arg 2 parsed as player
@@ -65,9 +65,9 @@ command /ss-admin [<text>] [<text>] [<text>]:
 					else:
 						message "{@P} %{_p}% has no shops"
 				else:
-					message "{@P} That user doesn't have exist"
+					message "{@P} That user doesn't exist"
 			else:
-				message "{@P} You must provide a players name to delete"
+				message "{@P} You must provide a player's name to remove."
 		else if arg 1 is "clearall":
 			if arg 2 is set:
 				set {_p} to arg 2 parsed as player
@@ -85,7 +85,7 @@ command /ss-admin [<text>] [<text>] [<text>]:
 					else:
 						message "{@P} %{_p}% has no shops"
 				else:
-					message "{@P} That user doesn't have exist"
+					message "{@P} That user doesn't exist"
 			else:
 				message "{@P} You must provide a players name to clear"
 		else if arg 1 is "convert":
