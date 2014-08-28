@@ -1,6 +1,6 @@
 == PayPoint ==
 
-PayPoint is a new economy script. Its basic but provides the main features.
+PayPoint is an economy script for, obviously, Skript. It's basic, but provides the main features needed of an economy script.
 
 === Usage ===
 
