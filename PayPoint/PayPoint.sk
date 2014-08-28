@@ -2,7 +2,7 @@
 # By nfell2009 & HoneyBuzzard
 
 options:
-	P:&9
+	P: &9
 	
 variables:
 	{pp::setting::currency} = "£" # Change to whatever currency you want
@@ -92,21 +92,48 @@ command /paypoint [<text>] [<text>] [<text>]:
 					
 command /pay [<text>] [<text>]:
 	trigger:
-		set {_p} to arg 1 parsed as player
-		set {_a} to arg 2 parsed as number
-		set {_u} to uuid of {_p}
-		if {_a} is greater than {pp::player::%uuid of player%::balance}:
-			message "{@P} You don't have that much money to pay"
-			stop
-		else if {pp::player::%{_u}%::exists} is not set:
-			message "{@P} Player: %{_p}% doesn't exist"
-			stop
+		if arg 1 is "confirm":
+			if {pp::player::%uuid of player%::spay} is true:
+				if {pp::player::%uuid of player%::spay::amount} is greater than {pp::player::%uuid of player%::balance}:
+					message "{@P} You don't have that much money to pay"
+					stop
+				else if {pp::player::%{pp::player::%uuid of player%::spay::to}%::exists} is not set:
+					message "{@P} Player: %{pp::player::%uuid of player%::spay::to}% doesn't exist"
+					stop
+				else:
+					subtract {pp::player::%uuid of player%::spay::amount} from {pp::player::%uuid of player%::balance}
+					add {pp::player::%uuid of player%::spay::amount} to {pp::player::%{pp::player::%uuid of player%::spay::to}%::balance}
+					message "{@P} You paid: %{pp::setting::currency}%%{pp::player::%uuid of player%::spay::amount}% to %{pp::player::%uuid of player%::spay::to}%"	
+			else:
+				message "{@P} You have nothing to confirm"
 		else:
-			subtract {_a} from {pp::player::%uuid of player%::balance}
-			add {_a} to {pp::player::%{_u}%::balance}
-			message "{@P} You paid: %{_a}% to %{_p}%"
+			set {_p} to arg 1 parsed as player
+			set {_a} to arg 2 parsed as number
+			set {_u} to uuid of {_p}
+			if {_a} is greater than {pp::player::%uuid of player%::balance}:
+				message "{@P} You don't have that much money to pay"
+				stop
+			else if {pp::player::%{_u}%::exists} is not set:
+				message "{@P} Player: %{_p}% doesn't exist"
+				stop
+			else:
+				subtract {_a} from {pp::player::%uuid of player%::balance}
+				add {_a} to {pp::player::%{_u}%::balance}
+				message "{@P} You paid: %{pp::setting::currency}%%{_a}% to %{_p}%"
 			
 command /balance:
 	aliases: /bal, /b, /money,
 	trigger:
-		message "{@P} Your balance is currently: %{pp::player::%uuid of player%::balance}%"
+		message "{@P} Your balance is currently: %{pp::setting::currency}%%{pp::player::%uuid of player%::balance}%"
+		
+on rightclick on sign:
+	if line 1 is "[PayPoint]":
+		if line 2 is set:
+			if line 3 is set:
+				message "{@P} Your payment information:"
+				message "{@P} Paying to: %line 2%"
+				message "{@P} Amount: %{pp::setting::currency}%%line 3%"
+				message "{@P} Do /pay confirm - to confirm the payment"
+				set {pp::player::%uuid of player%::spay} to true
+				set {pp::player::%uuid of player%::spay::to} to line 2 parsed as player
+				set {pp::player::%uuid of player%::spay::amount} to line 3 parsed as number
