@@ -4,7 +4,7 @@ options:
 	uMyC: [MyC] # MyConomy logging prefix
 	# Curreny related stuff #
 	B-C: true # Symbol before. Example: $1000. Set to false for: 1000$
-	QuickShop: false # If true, when a user creates a shop they will be given a code which they can use in /ss quickshop <code>. REQUIRES CODEGENAPI!
+	QuickShop: true # If true, when a user creates a shop they will be given a code which they can use in /ss quickshop <code>. REQUIRES CODEGENAPI!
 	# To change the currency symbol just change the £ sign below to whatever.
 	
 on script load:
@@ -100,6 +100,14 @@ command /ss-admin [<text>] [<text>] [<text>]:
 						add 1 to {_num}
 					message "{@P} Successfully converted chests from %arg 2% to %arg 3% (%{_num}%/%size of {ss.%arg 2%.chests::*}%/%size of {ss.%arg 3%.chests::*}%)"
 					delete {ss.%arg 2%.chests::*}
+					
+command /ss-console [<text>] [<text>] [<text>]:
+	executable by: console
+	trigger:
+		if arg 1 is "quickshop":
+			set {_p} to arg 2 parsed as player
+			set {_c} to arg 3
+			make {_p} execute command "/ss quickshop %{_c}%"
 			
 		   
 command /shopsearch [<text>] [<text>] [<item>]:
@@ -120,17 +128,24 @@ command /shopsearch [<text>] [<text>] [<item>]:
 				loop {ss.%{_p}%.chests::*}:
 					add 1 to {_num}
 					set {_loc} to location of block above block at loop-value
+					set {_cloc} to location of block at loop-value
 					set {_b} to block at {_loc}
 					set {_i} to line 4 of {_b} parsed as item
-					if line 1 of {_b} is "[Chest Shop]":
-						format slot {_num} of player with {_i} named "&aItem: %line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
+					if {ss.quickshop.%{_cloc}%} is set:
+						if line 1 of {_b} is "[Chest Shop]":
+							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss.quickshop.%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss.quickshop.%{_cloc}%}%"
+						else:
+							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss.quickshop.%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss.quickshop.%{_cloc}%}%"
 					else:
-						format slot {_num} of player with {_i} named "&aItem: %line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
+						if line 1 of {_b} is "[Chest Shop]":
+							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
+						else:
+							format slot {_num} of player with {_i} named "%line 4 of {_b}%" with lore "&aPlayer to: %line 1 of {_b}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close
 					delete {_loc}
 					delete {_b}
 		else if arg 1 is "quickshop":
 			if arg 2 is set:
-				if {ss.quickshop.%{_c}%} is set:
+				if {ss.quickshop.%arg 2%} is set:
 					set {_c} to arg 2
 					set {_loc} to {ss.quickshop.%{_c}%}
 					add 1 to y coord of {_loc}
@@ -142,6 +157,10 @@ command /shopsearch [<text>] [<text>] [<item>]:
 					set {ss.%uuid of player%.buying} to true
 					message "{@P} We have prepared your QuickShop!"
 					make player execute command "/ss buy"
+				else:
+					message "{@P} Invalid code"
+			else:
+				message "{@P} You must provide a code"
 		else if arg 1 is "stats":
 			if arg 2 is "help":
 				message "{@P} Stats help:"
@@ -370,6 +389,7 @@ on rightclick on chest:
 					if {@QuickShop} is true:
 						execute console command "/codegenapi g c %{ss.codegenapi.key}% %player% 4"
 						set {_c} to {cga.%{ss.codegenapi.key}%.%player%.code}
+						set {ss.quickshop.%{_c}%} to location of event-block
 						set {ss.quickshop.%location of event-block%} to {_c}
 						set {ss.quickshop.details.%{_c}%} to location of event-block
 						set {ss.quickshop.details.%{_c}%::playerto} to player
