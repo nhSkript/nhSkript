@@ -104,7 +104,7 @@ command /ss-admin [<text>] [<text>] [<text>]:
 		   
 command /shopsearch [<text>] [<text>] [<item>]:
 	description: Main ShopSearch command
-	#permission: shopsearch.usage
+	permission: shopsearch.usage
 	aliases: /ss, /searchs, /sshop,
 	trigger:
 		if arg 1 is not set:
