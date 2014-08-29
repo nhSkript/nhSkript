@@ -10,7 +10,7 @@ on script load:
 		wait 1 second
 		if {_num} = 60:
 			send "{@P} PPBanks failed to connect to PayPoint" to console
-			exit
+			execute console commnad "/sk disable %script%"
 	set {pp::api::extracommands::bank} to "pp-banks"
 
 command /pp-banks [<text>] [<text>] [<text>] [<text>]:
