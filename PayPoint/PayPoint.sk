@@ -97,7 +97,7 @@ command /paypoint [<text>] [<text>] [<text>]:
 			else:
 				message "{@P} Invalid command"
 		else if {pp::api::extracommands::%arg 1%} is set:
-				execute console command "/%arg 1% %player% %arg 2% %arg 3%"
+				execute console command "/%{pp::api::extracommands::%arg 1%}% %player% %arg 2% %arg 3%"
 		else:
 			message "{@P} Invalid command"
 			
