@@ -96,7 +96,11 @@ command /paypoint [<text>] [<text>] [<text>]:
 				message "{@P} This converter allows you to retrieve a users balance from MyConomy. You may notice that the user balance is only set when the player joins; this is due to a limitation in how MyConomy was written. There is no list of players for PayPoint to access and convert. The tools provided by the converter allow you to get the main parts from MyConomy. If you have any suggestions for the converter, please tell us on the Bukkit thread."
 			else:
 				message "{@P} Invalid command"
-					
+		else if {pp::api::extracommands::%arg 1%} is set:
+				execute console command "/%arg 1% %player% %arg 2% %arg 3%"
+		else:
+			message "{@P} Invalid command"
+			
 command /pay [<text>] [<text>]:
 	trigger:
 		if arg 1 is "confirm":
