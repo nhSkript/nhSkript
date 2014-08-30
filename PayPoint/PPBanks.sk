@@ -1,6 +1,9 @@
 # PPBanks (PayPoint Banks)
 # By nfell2009
 
+# PPBanks requires PayPoint! Download here: http://dev.bukkit.org/bukkit-plugins/skript/forum/scripts/70295-v1-0-pay-point-skript-2-1-2/#p1
+# If you don't have PayPoint then PPBanks will fail to start
+
 options:
 	P: &9
 
