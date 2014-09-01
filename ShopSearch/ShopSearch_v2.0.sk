@@ -30,8 +30,13 @@ DONE		message "{@P} - QuickShop data (requires ShopSearch_v1.4 to have been inst
 				set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
 				add loop-value to {ss::setting::playerlist::*}
 				
-command /shopsearch [<text>] [<text>] [<text>]:
+command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
 	trigger:
-		message "this isn't done :)"
+		if arg 1 is not set:
+			message "{@P} Do /ss help - for help"
+		else if arg 1 is "shop":
+			if arg 2 is set:
+				if arg 3 is set:
+					if arg 4 is set:
 			
