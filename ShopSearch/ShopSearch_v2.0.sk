@@ -39,4 +39,4 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 			if arg 2 is set:
 				if arg 3 is set:
 					if arg 4 is set:
-			
+						set {_p} to arg 2 parsed as player
