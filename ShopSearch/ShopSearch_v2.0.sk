@@ -3,15 +3,17 @@
 
 options:
 	P: &8[&aSS&8]&a
+	Click-Here: &a&l
+	Other-Text: &a
 
 on script load:
 		if {ss::setting::converted} is true:
 			stop
 		message "{@P} ShopSearch_v2.0 is starting conversion from ShopShop_1.X. Please note the converter will convert:" to console
-DONE		message "{@P} - Player chests (requires ShopSearch_v1.4 to have been installed)" to console
-DONE		message "{@P} - Player data" to console
-DONE		message "{@P} - ShopSearch data" to console
-DONE		message "{@P} - QuickShop data (requires ShopSearch_v1.4 to have been installed)" to console
+		message "{@P} - Player chests (requires ShopSearch_v1.4 to have been installed)" to console
+		message "{@P} - Player data" to console
+		message "{@P} - ShopSearch data" to console
+		message "{@P} - QuickShop data (requires ShopSearch_v1.4 to have been installed)" to console
 		if {ss.playerlist::*} is not empty:
 			loop {ss.playerlist::*}:
 				loop {ss.%loop-value%.chests::*}:
@@ -40,3 +42,47 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 				if arg 3 is set:
 					if arg 4 is set:
 						set {_p} to arg 2 parsed as player
+						set {_i} to arg 3 parsed as item
+						set {_a} to arg 4 parsed as number
+						set {_u} to uuid of {_p}
+						if {_a} contains ".":
+							set {_ar::*} to {_a} split at "."
+							set {_a} to {_ar::1}
+							message "{@P} You can only have an integer for the amount! ShopSearch has converted: %{_ar::2}% to %{_a}%"
+						loop {ss::player::%{_u}%::chests::*}:
+							add 1 to {_counter}
+							set {_loc} to loop-value
+							set {_bloc} to loop-value
+							add 1 to y coord of {_loc}
+							if block at {_loc} is sign:
+								set {_b} to block at {_loc}
+							if line 1 of {_b} is "[Chest Shop]":
+								set {_p} to {McCS.Owner.%{_loc}%}
+								set {_t} to true
+							else if line 1 of {_b} is {_p}:
+								set {_t} to true
+							if {_t} is true:
+								if line 2 of {_b} is {_a}:
+									if block at {_bloc} contains {_a} of {_i}:
+										if line 4 of {_b} is {_i}:
+											set {_l3} to line 3 of {_b}
+											set {_arr::*} to {_l3} split at ":"
+											set {_l3} to {_arr::1}
+											replace all "B" and " " in {_l3} with ""
+											set {ss::player::%{_u}%::transaction::buying} to true
+											set {ss::player::%{_u}%::transaction::sign-loc} to {_loc}
+											set set {ss::player::%{_u}%::transaction::chest-loc} to {_bloc}
+											set {ss::player::%{_u}%::transaction::amount} to {_a}
+											set {ss::player::%{_u}%::transaction::item} to {_i}
+											set {ss::player::%{_u}%::transaction::playerto} to {_p}
+											set {ss::player::%{_u}%::transaction::amount} to {_a}
+											set set {ss::player::%{_u}%::transaction::price} to {_l3}
+											message "{@P} ShopSearch has found a perfect match for you!"
+											message "{@P} Item: %{_i}%"
+											message "{@P} Amount: %{_a}%"
+											message "{@P} Price: %{_l3}%"
+											message "{@P} Buying from: %{_p}%"
+											send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" and "{@Other-Text}to confirm your purchase"
+											
+										
+						
