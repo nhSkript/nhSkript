@@ -31,7 +31,10 @@ on script load:
 				set {ss::player::%uuid of loop-value%::buying} to false
 				set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
 				add loop-value to {ss::setting::playerlist::*}
+				set {_u} to uuid of loop-value
 				
+				
+				{ss.itemlist-itm::%{ss.%uuid of player%.buying.item}%}
 command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
 	trigger:
@@ -49,6 +52,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							set {_ar::*} to {_a} split at "."
 							set {_a} to {_ar::1}
 							message "{@P} You can only have an integer for the amount! ShopSearch has converted: %{_ar::2}% to %{_a}%"
+						set {_counter} to 0
 						loop {ss::player::%{_u}%::chests::*}:
 							add 1 to {_counter}
 							set {_loc} to loop-value
@@ -69,20 +73,57 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 											set {_arr::*} to {_l3} split at ":"
 											set {_l3} to {_arr::1}
 											replace all "B" and " " in {_l3} with ""
-											set {ss::player::%{_u}%::transaction::buying} to true
-											set {ss::player::%{_u}%::transaction::sign-loc} to {_loc}
-											set set {ss::player::%{_u}%::transaction::chest-loc} to {_bloc}
-											set {ss::player::%{_u}%::transaction::amount} to {_a}
-											set {ss::player::%{_u}%::transaction::item} to {_i}
-											set {ss::player::%{_u}%::transaction::playerto} to {_p}
-											set {ss::player::%{_u}%::transaction::amount} to {_a}
-											set set {ss::player::%{_u}%::transaction::price} to {_l3}
+											set {ss::player::%uuid of player%::transaction::buying} to true
+											set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
+											set set {ss::player::%uuid of player%::transaction::chest-loc} to {_bloc}
+											set {ss::player::%uuid of player%::transaction::amount} to {_a}
+											set {ss::player::%uuid of player%::transaction::item} to {_i}
+											set {ss::player::%uuid of player%::transaction::playerto} to {_p}
+											set set {ss::player::%uuid of player%::transaction::price} to {_l3}
 											message "{@P} ShopSearch has found a perfect match for you!"
 											message "{@P} Item: %{_i}%"
 											message "{@P} Amount: %{_a}%"
 											message "{@P} Price: %{_l3}%"
 											message "{@P} Buying from: %{_p}%"
 											send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" and "{@Other-Text}to confirm your purchase"
-											
-										
-						
+											exit
+						message "{@P} There were: %size of {ss::player::%{_u}%::chests::*}% shops to check. ShopSearch checked %{_counter}%/%size of {ss::player::%{_u}%::chests::*}% before finding the perfect shop"
+		else if arg 1 is "confirm":
+			if {ss::player::%uuid of player%::transaction::buying} is true:
+				set {_a} to {ss::player::%uuid of player%::transaction::amount}
+				set {_i} to {ss::player::%uuid of player%::transaction::item}
+				set {_p} to {ss::player::%uuid of player%::transaction::playerto}
+				set {_u} to uuid of {_p}
+				set {_pr} to {ss::player::%uuid of player%::transaction::price}
+				set {_sloc} to {ss::player::%uuid of player%::transaction::sign-loc}
+				set {_cloc} to {ss::player::%uuid of player%::transaction::chest-loc}
+				if {@Custom-Economy} is true:
+					execute console command "/{@CE-Command-Check}"
+					wait 1 second
+					if {@CE-Variable} is true:
+						remove {_a} of {_i} from {_cloc}
+						give {_a} of {_i} to player
+						execute console command "/{@CE-Command-Transaction}"
+				else if {myc.enabled} is true:
+					execute op command "/myc-transaction normal ShopSearch %player% %{_p}% %{_pr}%"
+					if {myc.%uuid of player%.tcomplete} is true:
+						set {myc.%player%.tcomplete} to false
+						remove {_a} of {_i} from {_cloc}
+						give {_a} of {_i} to player
+						subtract {_pr} from {myc.%player%.money}
+						add {_pr} to {myc.%{_p}%.money}
+						message "{@P} You bought: %{_a}% %{_i}%"
+						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
+							set {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} to {_i}
+							set {ss::player::%uuid of player%::stats::itemlist::num::%{_i}%} to 1
+						else:
+							add 1 to {ss::player::%{_u}%::stats::itemlist::num::%{_i}%}
+						if {ss::player::%{_u}%::stats::playersales::p::%{_p}%} is not set:
+							set {ss::player::%uuid of player%::stats::playersales::p::%{_p}%} to {_p}
+							set {ss::player::%uuid of player%::stats::playersales::n::%{_p}%} to 1
+						else:
+							add 1 to {ss::player::%uuid of player%::stats::playersales::n::%{_p}%}
+						add {_pr} to {ss::global::totalmoney}
+						delete {ss::player::%uuid of player%::transaction::*}
+					else:
+						message "{@P} Transaction failed. Please try again."
