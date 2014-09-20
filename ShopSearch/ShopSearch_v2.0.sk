@@ -85,7 +85,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 											message "{@P} Amount: %{_a}%"
 											message "{@P} Price: %{_l3}%"
 											message "{@P} Buying from: %{_p}%"
-											send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" and "{@Other-Text}to confirm your purchase"
+											send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase"
 											exit
 						message "{@P} There were: %size of {ss::player::%{_u}%::chests::*}% shops to check. ShopSearch checked %{_counter}%/%size of {ss::player::%{_u}%::chests::*}% before finding the perfect shop"
 		else if arg 1 is "confirm":
