@@ -13,34 +13,38 @@ options:
 	CE-Command-Check: false
 
 on script load:
-		if {ss::setting::converted} is true:
-			stop
-		message "{@P} ShopSearch_v2.0 is starting conversion from ShopShop_1.X. Please note the converter will convert:" to console
-		message "{@P} - Player chests (requires ShopSearch_v1.4 to have been installed)" to console
-		message "{@P} - Player data" to console
-		message "{@P} - ShopSearch data" to console
-		message "{@P} - QuickShop data (requires ShopSearch_v1.4 to have been installed)" to console
-		if {ss.playerlist::*} is not empty:
-			loop {ss.playerlist::*}:
-				loop {ss.%loop-value%.chests::*}:
-					add loop-value-2 to {ss::player::%uuid of loop-value%::chests::*}
-					set {_c} to {ss.quickshop.%loop-value%}
-					set {ss::quickshop::%{_c}%} to loop-value
-					set {ss::quickshop::%loop-value%} to {_c}
-					set {ss::quickshop::%{_c}%::playerto} to {ss.quickshop.details.%{_c}%::playerto}
-					set {ss::quickshop::%{_c}%::amount} to {ss.quickshop.details.%{_c}%::amount}
-					set {ss::quickshop::%{_c}%::price} to {ss.quickshop.details.%{_c}%::price}
-					set {ss::quickshop::%{_c}%::item} to {ss.quickshop.details.%{_c}%::item}
-				delete {ss.%loop-value%.chests::*}
-				set {ss::player::%uuid of loop-value%} to loop-value
-				set {ss::player::%uuid of loop-value%::exists} to true
-				set {ss::player::%uuid of loop-value%::buying} to false
-				set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
-				add loop-value to {ss::setting::playerlist::*}
-				set {_u} to uuid of loop-value
-				
-				
-				{ss.itemlist-itm::%{ss.%uuid of player%.buying.item}%}
+		if {ss::setting::converted} is not true:
+			message "{@P} ShopSearch_v2.0 is starting conversion from ShopShop_1.X. Please note the converter will convert:" to console
+			message "{@P} - Player chests (requires ShopSearch_v1.4 to have been installed)" to console
+			message "{@P} - Player data" to console
+			message "{@P} - ShopSearch data" to console
+			message "{@P} - QuickShop data (requires ShopSearch_v1.4 to have been installed)" to console
+			message "{@P} - Stats (requires ShopSearch_v1.4 to have been installed)" to console
+			if {ss.playerlist::*} is not empty:
+				loop {ss.playerlist::*}:
+					loop {ss.%loop-value%.chests::*}:
+						add loop-value-2 to {ss::player::%uuid of loop-value%::chests::*}
+						set {_c} to {ss.quickshop.%loop-value%}
+						set {ss::quickshop::%{_c}%} to loop-value
+						set {ss::quickshop::%loop-value%} to {_c}
+						set {ss::quickshop::%{_c}%::playerto} to {ss.quickshop.details.%{_c}%::playerto}
+						set {ss::quickshop::%{_c}%::amount} to {ss.quickshop.details.%{_c}%::amount}
+						set {ss::quickshop::%{_c}%::price} to {ss.quickshop.details.%{_c}%::price}
+						set {ss::quickshop::%{_c}%::item} to {ss.quickshop.details.%{_c}%::item}
+					delete {ss.%loop-value%.chests::*}
+					set {ss::player::%uuid of loop-value%} to loop-value
+					set {ss::player::%uuid of loop-value%::exists} to true
+					set {ss::player::%uuid of loop-value%::buying} to false
+					set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
+					add loop-value to {ss::setting::playerlist::*}
+					set {_u} to uuid of loop-value
+				loop {ss.itemlist-itm::*}:
+					set {ss::stats::itm::%loop-value%} to loop-value
+					set {ss::stats::num::%loop-value%} to {ss.itemlist-num::%loop-value%}
+				loop {ss.playersales-p::*}:
+					set {ss::stats::playersales::p::%loop-value%} to loop-value
+					set {ss::stats::playersales::n::%loop-value%} to {ss.playersales-n::%loop-value%}
+					
 command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
 	trigger:
@@ -115,15 +119,15 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						add {_pr} to {myc.%{_p}%.money}
 						message "{@P} You bought: %{_a}% %{_i}%"
 						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
-							set {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} to {_i}
-							set {ss::player::%uuid of player%::stats::itemlist::num::%{_i}%} to 1
+							set {ss::stats::itm::%{_i}%} to {_i}
+							set {ss::stats::num::%{_i}%} to 1
 						else:
-							add 1 to {ss::player::%{_u}%::stats::itemlist::num::%{_i}%}
+							add 1 to {ss::stats::num::%{_i}%}
 						if {ss::player::%{_u}%::stats::playersales::p::%{_p}%} is not set:
-							set {ss::player::%uuid of player%::stats::playersales::p::%{_p}%} to {_p}
-							set {ss::player::%uuid of player%::stats::playersales::n::%{_p}%} to 1
+							set {ss::stats::playersales::p::%{_p}%} to {_p}
+							set {ss::stats::playersales::n::%{_p}%} to 1
 						else:
-							add 1 to {ss::player::%uuid of player%::stats::playersales::n::%{_p}%}
+							add 1 to {ss::stats::playersales::n::%{_p}%}
 						add {_pr} to {ss::global::totalmoney}
 						delete {ss::player::%uuid of player%::transaction::*}
 					else:
