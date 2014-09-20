@@ -13,38 +13,38 @@ options:
 	CE-Command-Check: false
 
 on script load:
-		if {ss::setting::converted} is not true:
-			message "{@P} ShopSearch_v2.0 is starting conversion from ShopShop_1.X. Please note the converter will convert:" to console
-			message "{@P} - Player chests (requires ShopSearch_v1.4 to have been installed)" to console
-			message "{@P} - Player data" to console
-			message "{@P} - ShopSearch data" to console
-			message "{@P} - QuickShop data (requires ShopSearch_v1.4 to have been installed)" to console
-			message "{@P} - Stats (requires ShopSearch_v1.4 to have been installed)" to console
-			if {ss.playerlist::*} is not empty:
-				loop {ss.playerlist::*}:
-					loop {ss.%loop-value%.chests::*}:
-						add loop-value-2 to {ss::player::%uuid of loop-value%::chests::*}
-						set {_c} to {ss.quickshop.%loop-value%}
-						set {ss::quickshop::%{_c}%} to loop-value
-						set {ss::quickshop::%loop-value%} to {_c}
-						set {ss::quickshop::%{_c}%::playerto} to {ss.quickshop.details.%{_c}%::playerto}
-						set {ss::quickshop::%{_c}%::amount} to {ss.quickshop.details.%{_c}%::amount}
-						set {ss::quickshop::%{_c}%::price} to {ss.quickshop.details.%{_c}%::price}
-						set {ss::quickshop::%{_c}%::item} to {ss.quickshop.details.%{_c}%::item}
-					delete {ss.%loop-value%.chests::*}
-					set {ss::player::%uuid of loop-value%} to loop-value
-					set {ss::player::%uuid of loop-value%::exists} to true
-					set {ss::player::%uuid of loop-value%::buying} to false
-					set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
-					add loop-value to {ss::setting::playerlist::*}
-					set {_u} to uuid of loop-value
-				loop {ss.itemlist-itm::*}:
-					set {ss::stats::itm::%loop-value%} to loop-value
-					set {ss::stats::num::%loop-value%} to {ss.itemlist-num::%loop-value%}
-				loop {ss.playersales-p::*}:
-					set {ss::stats::playersales::p::%loop-value%} to loop-value
-					set {ss::stats::playersales::n::%loop-value%} to {ss.playersales-n::%loop-value%}
-					
+	if {ss::setting::converted} is not true:
+		message "{@P} ShopSearch_v2.0 is starting conversion from ShopShop_1.X. Please note the converter will convert:" to console
+		message "{@P} - Player chests (requires ShopSearch_v1.4 to have been installed)" to console
+		message "{@P} - Player data" to console
+		message "{@P} - ShopSearch data" to console
+		message "{@P} - QuickShop data (requires ShopSearch_v1.4 to have been installed)" to console
+		message "{@P} - Stats (requires ShopSearch_v1.4 to have been installed)" to console
+		if {ss.playerlist::*} is not empty:
+			loop {ss.playerlist::*}:
+				loop {ss.%loop-value%.chests::*}:
+					add loop-value-2 to {ss::player::%uuid of loop-value%::chests::*}
+					set {_c} to {ss.quickshop.%loop-value%}
+					set {ss::quickshop::%{_c}%} to loop-value
+					set {ss::quickshop::%loop-value%} to {_c}
+					set {ss::quickshop::%{_c}%::playerto} to {ss.quickshop.details.%{_c}%::playerto}
+					set {ss::quickshop::%{_c}%::amount} to {ss.quickshop.details.%{_c}%::amount}
+					set {ss::quickshop::%{_c}%::price} to {ss.quickshop.details.%{_c}%::price}
+					set {ss::quickshop::%{_c}%::item} to {ss.quickshop.details.%{_c}%::item}
+				delete {ss.%loop-value%.chests::*}
+				set {ss::player::%uuid of loop-value%} to loop-value
+				set {ss::player::%uuid of loop-value%::exists} to true
+				set {ss::player::%uuid of loop-value%::buying} to false
+				set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
+				add loop-value to {ss::setting::playerlist::*}
+				set {_u} to uuid of loop-value
+			loop {ss.itemlist-itm::*}:
+				set {ss::stats::itm::%loop-value%} to loop-value
+				set {ss::stats::num::%loop-value%} to {ss.itemlist-num::%loop-value%}
+			loop {ss.playersales-p::*}:
+				set {ss::stats::playersales::p::%loop-value%} to loop-value
+				set {ss::stats::playersales::n::%loop-value%} to {ss.playersales-n::%loop-value%}
+				
 command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
 	trigger:
