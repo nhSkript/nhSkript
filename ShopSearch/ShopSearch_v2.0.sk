@@ -1,5 +1,9 @@
 # ShopSerach_v2.0
 # Please note: ShopSearch has been completely rewritten!
+#
+# By HoneyBuzzard & nfell2009
+#
+# Please note: the converter requires ShopSearch_v1.4 for a full conversion
 
 options:
 	P: &8[&aSS&8]&a
