@@ -111,13 +111,13 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 					execute console command "/{@CE-Command-Check}"
 				else if {myc.enabled} is true:
 					execute op command "/myc-transaction normal ShopSearch %player% %{_p}% %{_pr}%"
-					if {myc.%uuid of player%.tcomplete} is true:
+					if {myc.%player%.tcomplete} is true:
 						set {myc.%player%.tcomplete} to false
 						remove {_a} of {_i} from {_cloc}
 						execute console command "/ss-console remove {_i} {_a} _cloc"
 						execute console command "/ss-console give {_i} {_a} {_p}"
 						add {_pr} to {myc.%{_p}%.money}
-						message "{@P} You bought: %{_a}% %{_i}%"
+						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
 						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
 							set {ss::stats::itm::%{_i}%} to {_i}
 							set {ss::stats::num::%{_i}%} to 1
@@ -132,6 +132,46 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						delete {ss::player::%uuid of player%::transaction::*}
 					else:
 						message "{@P} Transaction failed. Please try again."
+				else if {pp::setting::running} is true:
+					if {pp::player::%uuid of player%::balance} is greater than or equal to {_pr}:
+						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
+							set {ss::stats::itm::%{_i}%} to {_i}
+							set {ss::stats::num::%{_i}%} to 1
+						else:
+							add 1 to {ss::stats::num::%{_i}%}
+						if {ss::player::%{_u}%::stats::playersales::p::%{_p}%} is not set:
+							set {ss::stats::playersales::p::%{_p}%} to {_p}
+							set {ss::stats::playersales::n::%{_p}%} to 1
+						else:
+							add 1 to {ss::stats::playersales::n::%{_p}%}
+						add {_pr} to {ss::global::totalmoney}
+						execute console command "/ss-console remove {_i} {_a} _cloc"
+						execute console command "/ss-console give {_i} {_a} {_p}"
+						subtract {_pr} from {pp::player::%uuid of player%::balance}
+						add {_pr} to {ss.%uuid of player%.buying.playerto}'s balance
+						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
+						delete {ss::player::%uuid of player%::transaction::*}
+					else:
+						message "{@P} You can't afford to do that"
+				else:
+					if player's balance is greater than or equal to {_price}:
+						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
+							set {ss::stats::itm::%{_i}%} to {_i}
+							set {ss::stats::num::%{_i}%} to 1
+						else:
+							add 1 to {ss::stats::num::%{_i}%}
+						if {ss::player::%{_u}%::stats::playersales::p::%{_p}%} is not set:
+							set {ss::stats::playersales::p::%{_p}%} to {_p}
+							set {ss::stats::playersales::n::%{_p}%} to 1
+						else:
+							add 1 to {ss::stats::playersales::n::%{_p}%}
+						add {_pr} to {ss::global::totalmoney}
+						execute console command "/ss-console remove {_i} {_a} _cloc"
+						execute console command "/ss-console give {_i} {_a} {_p}"
+						subtract {_pr} from the player's balance
+						add {_pr} to the balance of {_p}
+						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
+						delete {ss::player::%uuid of player%::transaction::*}
 		else if {ss::api::customcommands::%arg 1%} is set:
 			set {_num} to {ss::api::customcommands::%arg 1%::arg-count}
 			set {_cmd} to "%{ss::api::customcommands::%arg 1%::command}%"
