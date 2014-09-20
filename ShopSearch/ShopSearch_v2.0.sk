@@ -110,8 +110,8 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 					if {myc.%uuid of player%.tcomplete} is true:
 						set {myc.%player%.tcomplete} to false
 						remove {_a} of {_i} from {_cloc}
-						give {_a} of {_i} to player
-						subtract {_pr} from {myc.%player%.money}
+						execute console command "/ss-console remove {_i} {_a} _cloc"
+						execute console command "/ss-console give {_i} {_a} {_p}"
 						add {_pr} to {myc.%{_p}%.money}
 						message "{@P} You bought: %{_a}% %{_i}%"
 						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
@@ -128,4 +128,26 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						delete {ss::player::%uuid of player%::transaction::*}
 					else:
 						message "{@P} Transaction failed. Please try again."
+		else if {ss::api::customcommands::%arg 1%} is set:
+			set {_num} to {ss::api::customcommands::%arg 1%::arg-count}
+			set {_cmd} to "%{ss::api::customcommands::%arg 1%::command}%"
+			if {_num} is not 0:
+				loop {_num} times:
+					add 1 to {_count}
+					set {_cmd} to "%{_cmd}% %arg %{_count}%%
+			make player execute command "/%{_cmd}%"
+				
+command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>]:
+	executable by: console
+	trigger:
+		if arg 1 is "remove":
+			set {_i} to arg 1 parsed as item
+			set {_a} to arg 2 parsed as integer
+			set {_loc} to {%arg 3%}
+			remove {_a} of {_i} from block at {_loc}
+		else if arg 1 is "give":
+			set {_i} to arg 1 parsed as item
+			set {_a} to arg 2 parsed as integer
+			set {_p} to arg 3 parsed as player
+			give {_a} of {_i} to {_p}
 				
