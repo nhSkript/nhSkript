@@ -9,6 +9,10 @@ options:
 	P: &8[&aSS&8]&a
 	Click-Here: &a&l
 	Other-Text: &a
+	Custom-Economy: false # Set to true for custom economy. See: http://nfell2009.uk/shopsearch/api?customeconomy
+	CE-Command-Check: false
+	CE-Variable: false
+	CE-Command-Transaction: false
 
 on script load:
 		if {ss::setting::converted} is true:
@@ -103,11 +107,6 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 				set {_cloc} to {ss::player::%uuid of player%::transaction::chest-loc}
 				if {@Custom-Economy} is true:
 					execute console command "/{@CE-Command-Check}"
-					wait 1 second
-					if {@CE-Variable} is true:
-						remove {_a} of {_i} from {_cloc}
-						give {_a} of {_i} to player
-						execute console command "/{@CE-Command-Transaction}"
 				else if {myc.enabled} is true:
 					execute op command "/myc-transaction normal ShopSearch %player% %{_p}% %{_pr}%"
 					if {myc.%uuid of player%.tcomplete} is true:
@@ -131,3 +130,4 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						delete {ss::player::%uuid of player%::transaction::*}
 					else:
 						message "{@P} Transaction failed. Please try again."
+				
