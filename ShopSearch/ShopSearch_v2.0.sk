@@ -9,10 +9,8 @@ options:
 	P: &8[&aSS&8]&a
 	Click-Here: &a&l
 	Other-Text: &a
-	Custom-Economy: false # Set to true for custom economy. See: http://nfell2009.uk/shopsearch/api?customeconomy
+	Custom-Economy: false # Set to true for custom economy. See: http://nfell2009.uk/shopsearch/api?r=ce
 	CE-Command-Check: false
-	CE-Variable: false
-	CE-Command-Transaction: false
 
 on script load:
 		if {ss::setting::converted} is true:
