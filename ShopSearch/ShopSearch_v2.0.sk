@@ -11,6 +11,8 @@ options:
 	Other-Text: &a
 	Custom-Economy: false # Set to true for custom economy. See: http://nfell2009.uk/shopsearch/api?r=ce
 	CE-Command-Check: false
+	CE-Command-Check2: false
+	CE-Command-Add: false
 
 on script load:
 	if {ss::setting::converted} is not true:
@@ -107,13 +109,94 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 				set {_pr} to {ss::player::%uuid of player%::transaction::price}
 				set {_sloc} to {ss::player::%uuid of player%::transaction::sign-loc}
 				set {_cloc} to {ss::player::%uuid of player%::transaction::chest-loc}
+				if {@GiftCard-Payment} is true:
+					set {_l} to lore of the player's tool
+					set {_ll::*} to {_l} split at ":"
+					replace all " " in {_ll::2} with ""
+					set {_c} to {_ll::2}
+					if {gfc::codes::%{_c}%::redeemed} is false:
+						if {gfc::codes::%{_c}%::value} is less than {_pr}:
+							subtract {gfc::codes::%{_c}%::value} from {_pr}
+							if {@Custom-Economy} is true:
+								execute console command "/{@CE-Command-Check2}"
+								wait 1 second
+								if {ss::temp::%uuid of player%::do-trans} is not set:
+									message "{@P} You can't afford to do that right now"
+									stop
+							else if {myc.enabled} is true:
+								if {myc.%player%.money} is less than {_pr}:
+									message "{@P} You can't afford to do that right now"
+									stop
+							else if {pp::setting::running} is true:
+								if {pp::player::%uuid of player%::balance} is less than {_pr}:
+									message "{@P} You can't afford to do that right now"
+									stop
+							else if the player's balance is less than {_pr}:
+								message "{@P} You can't afford to do that right now"
+								stop
+							message "{@P} ShopSearch has used your GiftCard valued at: %{gfc::codes::%{_c}%::value}% and will now subtract funds from your bank"
+							set the player's tool to air
+							set {gfc::codes::%{_c}%::redeemed} to true
+						else if {gfc::codes::%{_c}%::value} is equal to {_pr}:
+							set the player's tool to air
+							set {gfc::codes::%{_c}%::redeemed} to true
+							execute console command "/ss-console remove {_i} {_a} _cloc"
+							execute console command "/ss-console give {_i} {_a} {_p}"
+							if {@Custom-Economy} is true:
+								execute console command "/{@CE-Command-Add}"
+							else if {myc.enabled} is true:
+								add {_pr} to {myc.%{_p}%.money}
+							else if {pp::setting::running} is true:
+								add {_pr} to {pp::player::%{_u}%::balance}
+							else:
+								add {_pr} to the balance of {_p}
+							message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
+							if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
+								set {ss::stats::itm::%{_i}%} to {_i}
+								set {ss::stats::num::%{_i}%} to 1
+							else:
+								add 1 to {ss::stats::num::%{_i}%}
+							if {ss::player::%{_u}%::stats::playersales::p::%{_p}%} is not set:
+								set {ss::stats::playersales::p::%{_p}%} to {_p}
+								set {ss::stats::playersales::n::%{_p}%} to 1
+							else:
+								add 1 to {ss::stats::playersales::n::%{_p}%}
+							add {_pr} to {ss::global::totalmoney}
+							delete {ss::player::%uuid of player%::transaction::*}
+						else if {gfc::codes::%{_c}%::value} is greater than {_pr}:
+							set the player's tool to air
+							set {gfc::codes::%{_c}%::redeemed} to true
+							execute console command "/ss-console remove {_i} {_a} _cloc"
+							execute console command "/ss-console give {_i} {_a} {_p}"
+							if {@Custom-Economy} is true:
+								execute console command "/{@CE-Command-Add}"
+							else if {myc.enabled} is true:
+								add {_pr} to {myc.%{_p}%.money}
+							else if {pp::setting::running} is true:
+								add {_pr} to {pp::player::%{_u}%::balance}
+							else:
+								add {_pr} to the balance of {_p}
+							message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
+							if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
+								set {ss::stats::itm::%{_i}%} to {_i}
+								set {ss::stats::num::%{_i}%} to 1
+							else:
+								add 1 to {ss::stats::num::%{_i}%}
+							if {ss::player::%{_u}%::stats::playersales::p::%{_p}%} is not set:
+								set {ss::stats::playersales::p::%{_p}%} to {_p}
+								set {ss::stats::playersales::n::%{_p}%} to 1
+							else:
+								add 1 to {ss::stats::playersales::n::%{_p}%}
+							add {_pr} to {ss::global::totalmoney}
+							subtract {_pr} from {gfc::codes::%{_c}%::value}
+							give 1 of paper named "%{gfc::setting::prefix}% GiftCard - Value: %{gfc::codes::%{_c}%::value}%" with lore "&aGift Code: %{_c}%" to the player
+							delete {ss::player::%uuid of player%::transaction::*}
 				if {@Custom-Economy} is true:
 					execute console command "/{@CE-Command-Check}"
 				else if {myc.enabled} is true:
 					execute op command "/myc-transaction normal ShopSearch %player% %{_p}% %{_pr}%"
 					if {myc.%player%.tcomplete} is true:
 						set {myc.%player%.tcomplete} to false
-						remove {_a} of {_i} from {_cloc}
 						execute console command "/ss-console remove {_i} {_a} _cloc"
 						execute console command "/ss-console give {_i} {_a} {_p}"
 						add {_pr} to {myc.%{_p}%.money}
