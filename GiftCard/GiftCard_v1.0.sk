@@ -99,7 +99,7 @@ command /giftcard [<text>] [<text>] [<text>]:
 					else:
 						add {_i} to the player's balance
 						message "{@P} Added: %{_i}% to your balance!"
-					#set {gfc::codes::%{_c}%::redeemed} to true
+					set {gfc::codes::%{_c}%::redeemed} to true
 						
 on sign change:
 	if line 1 is "{@Sign-1TXT}" or "{@Sign-1}":
