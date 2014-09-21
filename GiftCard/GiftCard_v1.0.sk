@@ -147,7 +147,7 @@ on rightclick on sign:
 						stop
 				execute console command "/codegenapi g c %{gfc::cga::key}% %player% {@Code-Length}"
 				set {_c} to {cga.%{gfc::cga::key}%.%player%.code}		
-				give 1 of paper named "{@P} GiftCard - Value: %{_i}%" with lore "Gift Code: %{_c}%" to the player
+				give 1 of paper named "{@P} GiftCard - Value: %{_i}%" with lore "&aGift Code: %{_c}%" to the player
 				set {gfc::codes::%{_c}%} to {_c}
 				set {gfc::codes::%{_c}%::creator} to player
 				set {gfc::codes::%{_c}%::value} to {_i}
@@ -193,7 +193,7 @@ on chat:
 				subtract {_i} from the player's balance
 		execute console command "/codegenapi g c %{gfc::cga::key}% %player% {@Code-Length}"
 		set {_c} to {cga.%{gfc::cga::key}%.%player%.code}		
-		give 1 of paper named "{@P} GiftCard - Value: %{_i}%" with lore "Gift Code: %{_c}%" to the player
+		give 1 of paper named "{@P} GiftCard - Value: %{_i}%" with lore "&aGift Code: %{_c}%" to the player
 		set {gfc::codes::%{_c}%} to {_c}
 		set {gfc::codes::%{_c}%::creator} to player
 		set {gfc::codes::%{_c}%::value} to {_i}
