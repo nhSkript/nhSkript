@@ -1,0 +1,202 @@
+# GiftCard
+# By nfell2009
+
+options:
+	P: &6[&bGC&6]&b
+	Command: false # Can players use a command to get gift cards
+	Vendor: true   # Can players get gift cards from vendors
+	Vendor-Perm: giftcard.vendor # Permission for creating signs
+	Sign-1: &a[GiftCard] # Top line of the sign
+	Sign-1TXT: giftcard # Just plain text top line
+	Redeemable: true # Can players use exchange gift cards for money
+	Gift-Command: true # Can players use /giftcard gift <player> and directly give them their GiftCard
+	Main-CMD: giftcard.usage
+	Custom-Economy: false # Set to true for custom economy.
+	CE-Command-Check: false # Set to check if the player can afford something. Variables: {_i} - this is how much the user wants to pay
+	CE-Command-Add: false # Set to add money to the player's balance. Variables: {_i} - this is how much the GiftCard is worth
+	Code-Length: 6 # How long are the gift codes?
+		
+on script load:
+	if {myc.GiftCard-Fund.started} is not set:
+		set {myc.GiftCard-Fund.started} to "True"
+		set {myc.GiftCard-Fund.money} to 0
+	if {gfc::cga::key} is not set:
+		execute console command "/codegenapi g k GiftCard"
+		set {gfc::cga::key} to {cga.GiftCard.code}
+		if {gfc::cga::key} is not set:
+			set {gfc::mode::disabled} to true
+			broadcast "{@P} GiftCard failed to find a required dependency: CodeGenAPI and will fail to do any request!"
+		else:
+			set {gfc::mode::disabled} to false
+	else:
+		set {gfc::mode::disabled} to false
+	delete {gfc::allowednumbers::*}
+	set {gfc::allowednumbers::1} to 1
+	set {gfc::allowednumbers::2} to 2
+	set {gfc::allowednumbers::3} to 3
+	set {gfc::allowednumbers::4} to 4
+	set {gfc::allowednumbers::5} to 5
+	set {gfc::allowednumbers::6} to 6
+	set {gfc::allowednumbers::7} to 7
+	set {gfc::allowednumbers::8} to 8
+	set {gfc::allowednumbers::9} to 9
+	set {gfc::allowednumbers::0} to 0
+	
+command /giftcard [<text>] [<text>] [<text>]:
+	permission: {@Main-CMD}
+	trigger:
+		if {gfc::mode::disabled} is true:
+			message "{@P} GiftCard failed to find a required dependency: CodeGenAPI and cannot continue with your request."
+			message "{@P} Please report this to a staff member."
+			stop
+		if arg 1 is "buy":
+			if {@Command} is true:
+				if arg 2 is set:
+					set {_i} to arg 2 parsed as number
+					if {@Custom-Economy} is true:
+						execute console command "/{@CE-Command-Check}"
+					else if {myc.enabled} is true:
+						execute op command "/myc-transaction normal GiftCard %player% GiftCard-Fund %{_i}%"
+						if {myc.%player%.tcomplete} is true:
+							set {myc.%player%.tcomplete} to false
+						else:
+							message "{@P} There seems to have been a problem with MyConomy (you may not have enough funds). Please try again."
+							stop
+					else if {pp::setting::running} is true:
+						if {pp::player::%uuid of player%::balance} is less than {_i}:
+							message "{@P} You can't afford that right now"
+							stop
+					else:
+						if the player's balance is less than {_i}:
+							message "{@P} You can't afford that right now"
+							stop
+					execute console command "/codegenapi g c %{gfc::cga::key}% %player% {@Code-Length}"
+					set {_c} to {cga.%{gfc::cga::key}%.%player%.code}		
+					give 1 of paper named "{@P} GiftCard - Value: %{_i}%" with lore "Gift Code: %{_c}%" to the player
+					set {gfc::codes::%{_c}%} to {_c}
+					set {gfc::codes::%{_c}%::creator} to player
+					set {gfc::codes::%{_c}%::value} to {_i}
+					set {gfc::codes::%{_c}%::redeemed} to false
+			else:
+				message "{@P} Buying GiftCards through command has been disabled. Find a vendor to buy through"
+		else if arg 1 is "redeem":
+			if {@Redeemable} is true:
+				set {_l} to lore of the player's tool
+				set {_ll::*} to {_l} split at ":"
+				set {_c} to {_ll::2}
+				replace all " " in {_c} with ""
+				if {gfc::codes::%{_c}%::redeemed} is false:
+					set {_i} to {gfc::codes::%{_c}%::value}
+					set the player's tool to air
+					if {@Custom-Economy} is true:
+						execute console command "/{@CE-Command-Add}"
+					else if {myc.enabled} is true:
+						add {_i} to {myc.%player%.money}
+						message "{@P} Added: %{_i}% to your balance!"
+					else if {pp::setting::running} is true:
+						add {_i} to {pp::player::%uuid of player%::balance}
+						message "{@P} Added: %{_i}% to your balance!"
+					else:
+						add {_i} to the player's balance
+						message "{@P} Added: %{_i}% to your balance!"
+					#set {gfc::codes::%{_c}%::redeemed} to true
+						
+on sign change:
+	if line 1 is "{@Sign-1TXT}" or "{@Sign-1}":
+		if {gfc::mode::disabled} is true:
+			message "{@P} GiftCard failed to find a required dependency: CodeGenAPI and cannot continue with your request."
+			message "{@P} Please report this to a staff member."
+			cancel event
+			stop
+		if player doesn't have permission "{@Vendor-Perm}":
+			cancel event
+		else:
+			set line 1 to "{@Sign-1}"
+			
+on rightclick on sign:
+	if {gfc::mode::disabled} is true:
+		message "{@P} GiftCard failed to find a required dependency: CodeGenAPI and cannot continue with your request."
+		message "{@P} Please report this to a staff member."
+		stop
+	if line 1 is "{@Sign-1}":
+		if {@Vendor} is true:
+			if line 2 is "Any Amount":
+				message "{@P} Please say how much you would like on your GiftCard."
+				message "{@P} You have 10 seconds until this is cancelled."
+				set {gfc::player::%player%::to-enter} to true
+				wait 10 seconds
+				set {gfc::player::%player%::to-enter} to false
+			else:
+				set {_i} to line 2 parsed as number
+				if {@Custom-Economy} is true:
+					execute console command "/{@CE-Command-Check}"
+				else if {myc.enabled} is true:
+					execute op command "/myc-transaction normal GiftCard %player% GiftCard-Fund %{_i}%"
+					if {myc.%player%.tcomplete} is true:
+						set {myc.%player%.tcomplete} to false
+					else:
+						message "{@P} There seems to have been a problem with MyConomy (you may not have enough funds). Please try again."
+						stop
+				else if {pp::setting::running} is true:
+					if {pp::player::%uuid of player%::balance} is less than {_i}:
+						message "{@P} You can't afford that right now"
+						stop
+				else:
+					if balance of the player is less than {_i}:
+						message "{@P} You can't afford that right now"
+						stop
+				execute console command "/codegenapi g c %{gfc::cga::key}% %player% {@Code-Length}"
+				set {_c} to {cga.%{gfc::cga::key}%.%player%.code}		
+				give 1 of paper named "{@P} GiftCard - Value: %{_i}%" with lore "Gift Code: %{_c}%" to the player
+				set {gfc::codes::%{_c}%} to {_c}
+				set {gfc::codes::%{_c}%::creator} to player
+				set {gfc::codes::%{_c}%::value} to {_i}
+				set {gfc::codes::%{_c}%::redeemed} to false
+				
+on chat:
+	if {gfc::player::%player%::to-enter} is true:
+		if {gfc::mode::disabled} is true:
+			message "{@P} GiftCard failed to find a required dependency: CodeGenAPI and cannot continue with your request."
+			message "{@P} Please report this to a staff member."
+			cancel event
+			stop
+		cancel event
+		set {_s} to length of message
+		loop {_s} times:
+			add 1 to {_num}
+			set {_arr::%{_num}%} to subtext of message from characters {_num} to {_num}
+		loop {_arr::*}:
+			if {gfc::allowednumbers::%loop-value%} is not set:
+				message "{@P} Invalid number"
+				stop
+		set {_i} to message parsed as number
+		if {@Custom-Economy} is true:
+			execute console command "/{@CE-Command-Check}"
+		else if {myc.enabled} is true:
+			execute op command "/myc-transaction normal GiftCard %player% GiftCard-Fund %{_i}%"
+			if {myc.%player%.tcomplete} is true:
+				set {myc.%player%.tcomplete} to false
+			else:
+				message "{@P} There seems to have been a problem with MyConomy (you may not have enough funds). Please try again."
+				stop
+		else if {pp::setting::running} is true:
+			if {pp::player::%uuid of player%::balance} is less than {_i}:
+				message "{@P} You can't afford that right now"
+				stop
+			else:
+				subtract {_i} from {pp::player::%uuid of player%::balance}
+		else:
+			if balance of the player is less than {_i}:
+				message "{@P} You can't afford that right now"
+				stop
+			else:
+				subtract {_i} from the player's balance
+		execute console command "/codegenapi g c %{gfc::cga::key}% %player% {@Code-Length}"
+		set {_c} to {cga.%{gfc::cga::key}%.%player%.code}		
+		give 1 of paper named "{@P} GiftCard - Value: %{_i}%" with lore "Gift Code: %{_c}%" to the player
+		set {gfc::codes::%{_c}%} to {_c}
+		set {gfc::codes::%{_c}%::creator} to player
+		set {gfc::codes::%{_c}%::value} to {_i}
+		set {gfc::codes::%{_c}%::redeemed} to false
+		set {gfc::player::%player%::to-enter} to false
+				
