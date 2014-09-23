@@ -13,6 +13,7 @@ options:
 	CE-Command-Check: false
 	CE-Command-Check2: false
 	CE-Command-Add: false
+	QuickShop: true
 
 on script load:
 	if {ss::setting::converted} is not true:
@@ -52,6 +53,8 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	trigger:
 		if arg 1 is not set:
 			message "{@P} Do /ss help - for help"
+		else if arg 1 is "add":
+			
 		else if arg 1 is "shop":
 			if arg 2 is set:
 				if arg 3 is set:
