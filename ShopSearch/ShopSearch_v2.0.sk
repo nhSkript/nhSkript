@@ -81,7 +81,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						else:
 							format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
 					else:
-						format slot {_num} of player with {_i} named "&4Out of stock" with lore "&4Unfortunately this item is currently out of stock" to be unstealable
+						format slot {_num} of player with {_i} named "&4Out of stock" with lore "&4Unfortunately this item is currently out of stock!" to be unstealable
 		else if arg 1 is "add":
 			if arg 2 is not set:
 				set {ss::player::%uuid of player%::setting::add-num} to 1
