@@ -151,6 +151,19 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	trigger:
 		if arg 1 is not set:
 			message "{@P} Do /ss help - for help"
+		else if arg 1 is "about":
+			if arg 2 is "me":
+				message "{@P} Shops: %size of {ss::player::%uuid of player%::chests::*}%"
+				set {_n} to 0
+				set {_co} to 0
+				loop {ss::player::%uuid of player%::chests::*}:
+					add {ss::player::%uuid of player%::sales::%loop-value%} to {_co}
+					if {ss::player::%uuid of player%::sales::%loop-value%} is greater than or equal to {_n}:
+						set {_n} to {ss::player::%uuid of player%::sales::%loop-value%}
+						set {_l} to loop-value
+						set {_c} to {ss::quickshop::%loop-value%}
+				message "{@P} Best Shop: Sales - %{_n}% QuickShop - %{_c}% - Location - %{_l}%"]
+				message "{@P} Total Sales: %{_co}%
 		else if arg 1 is "menu":
 			if arg 2 is set:
 				set {_p} to arg 2 parsed as player
@@ -363,6 +376,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							message "{@P} ShopSearch has used your GiftCard valued at: %{gfc::codes::%{_c}%::value}% and will now subtract funds from your bank"
 							set the player's tool to air
 							set {gfc::codes::%{_c}%::redeemed} to true
+							add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
 						else if {gfc::codes::%{_c}%::value} is equal to {_pr}:
 							set the player's tool to air
 							set {gfc::codes::%{_c}%::redeemed} to true
@@ -389,6 +403,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 								add 1 to {ss::stats::playersales::n::%{_p}%}
 							add {_pr} to {ss::global::totalmoney}
 							delete {ss::player::%uuid of player%::transaction::*}
+							add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
 						else if {gfc::codes::%{_c}%::value} is greater than {_pr}:
 							set the player's tool to air
 							set {gfc::codes::%{_c}%::redeemed} to true
@@ -417,6 +432,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							subtract {_pr} from {gfc::codes::%{_c}%::value}
 							give 1 of paper named "%{gfc::setting::prefix}% GiftCard - Value: %{gfc::codes::%{_c}%::value}%" with lore "&aGift Code: %{_c}%" to the player
 							delete {ss::player::%uuid of player%::transaction::*}
+							add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
 				if {@Custom-Economy} is true:
 					execute console command "/{@CE-Command-Check}"
 				else if {myc.enabled} is true:
@@ -439,6 +455,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							add 1 to {ss::stats::playersales::n::%{_p}%}
 						add {_pr} to {ss::global::totalmoney}
 						delete {ss::player::%uuid of player%::transaction::*}
+						add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
 					else:
 						message "{@P} Transaction failed. Please try again."
 				else if {pp::setting::running} is true:
@@ -460,6 +477,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						add {_pr} to {ss.%uuid of player%.buying.playerto}'s balance
 						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
 						delete {ss::player::%uuid of player%::transaction::*}
+						add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
 					else:
 						message "{@P} You can't afford to do that"
 				else:
@@ -481,6 +499,9 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						add {_pr} to the balance of {_p}
 						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
 						delete {ss::player::%uuid of player%::transaction::*}
+						add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
+					else:
+						message "{@P} You can't afford to do that"
 		else if {ss::api::customcommands::%arg 1%} is set:
 			set {_num} to {ss::api::customcommands::%arg 1%::arg-count}
 			set {_cmd} to "%{ss::api::customcommands::%arg 1%::command}%"
