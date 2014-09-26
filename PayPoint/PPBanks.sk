@@ -1,0 +1,79 @@
+# PPBanks (PayPoint Banks)
+# By nfell2009
+
+# PPBanks requires PayPoint! Download here: http://dev.bukkit.org/bukkit-plugins/skript/forum/scripts/70295-v1-0-pay-point-skript-2-1-2/#p1
+# If you don't have PayPoint then PPBanks will fail to start
+
+options:
+	P: &9
+
+on script load:
+	while {pp::setting::running} is not true:
+		add 1 to {_num}
+		wait 1 second
+		if {_num} = 60:
+			send "{@P} PPBanks failed to connect to PayPoint" to console
+			execute console commnad "/sk disable %script%"
+	set {pp::api::extracommands::bank} to "pp-banks"
+
+command /pp-banks [<text>] [<text>] [<text>] [<text>]:
+	executable by: console
+	trigger:
+		set {_p} to arg 1 parsed as player
+		set {_u} to uuid of {_p}
+		if arg 2 is "help":
+			send "{@P} Commands for PayPoint-Banks:" to {_p}
+			send "{@P} /pp bank create - Creates a bank for you" to {_p}
+			send "{@P} /pp bank close - Closes your bank account (withdraws all money to your account)" to {_p}
+			send "{@P} /pp bank deposit <amount> - Deposits the amount to your bank" to {_p}
+			send "{@P} /pp bank withdraw <amount> - Withdraws the amount from your bank" to {_p}
+			send "{@P} /pp bank balance - Shows your bank balance" to {_p}
+		else if arg 2 is "create":
+			if {ppb::player::%{_u}%::bank::hasbank} is not true:
+				set {ppb::player::%{_u}%::bank::hasbank} to true
+				set {ppb::player::%{_u}%::bank::balance} to 0
+				send "{@P} Created bank. For help type: /pp bank help" to {_p}
+			else:
+				send "{@P} You already have a bank. For help type: /pp bank help" to {_p}
+		else if arg 2 is "close":
+			if {ppb::player::%{_u}%::bank::hasbank} is true:
+				add {ppb::player::%{_u}%::bank::balance} to {pp::player::%{_u}%::balance}
+				delete {ppb::player::%{_u}%::bank::*}
+				send "{@P} Closed your bank account" to {_p}
+			else:
+				send "{@P} You don't have a bank. For help type: /pp bank help" to {_p}
+		else if arg 2 is "deposit":
+			if {ppb::player::%{_u}%::bank::hasbank} is not true:
+				send "{@P} You don't have a bank" to {_p}
+				stop
+			if arg 3 is set:
+				set {_a} to arg 3 parsed as number
+				if {_a} is less than or equal to {pp::player::%{_u}%::balance}:
+					subtract {_a} from {pp::player::%{_u}%::balance}
+					add {_a} to {ppb::player::%{_u}%::bank::balance}
+					send "{@P} Deposited %{pp::setting::currency}%%{_a}% to your bank account" to {_p}
+				else:
+					message "{@P} You don't have that much money to deposit" to {_p}
+			else:
+				message "{@P} You must provide an amount to deposit" to {_p}
+		else if arg 2 is "withdraw":
+			if {ppb::player::%{_u}%::bank::hasbank} is not true:
+				send "{@P} You don't have a bank account" to {_p}
+				stop
+			if arg 3 is set:
+				set {_a} to arg 3 parsed as number
+				if {_a} is less than or equal to {ppb::player::%{_u}%::bank::balance}:
+					add {_a} to {pp::player::%{_u}%::balance}
+					subtract {_a} from {ppb::player::%{_u}%::bank::balance}
+					send "{@P} Withdrew %{pp::setting::currency}%%{_a}% from your bank account" to {_p}
+				else:
+					message "{@P} You don't have that much money to withdraw" to {_p}
+			else:
+				message "{@P} You must provide an amount to withdraw" to {_p}
+		else if arg 2 is "balance":
+			if {ppb::player::%{_u}%::bank::hasbank} is not true:
+				send "{@P} You don't have a bank account." to {_p}
+				stop
+			send "{@P} Your bank balance: %{pp::setting::currency}%%{ppb::player::%{_u}%::bank::balance}%" to {_p}
+		else:
+			send "{@P} Invalid command" to {_p}

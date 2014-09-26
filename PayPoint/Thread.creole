@@ -1,0 +1,45 @@
+== PayPoint ==
+
+PayPoint is an economy script for, obviously, Skript. It's basic, but provides the main features needed of an economy script.
+
+=== Usage ===
+
+There are a few commands in PayPoint:
+* /pay <player> <amount> - Pays a player
+* /bal - Shows the balance of the player
+* /pp convert help - Lists information about the converter
+
+=== How it works ===
+
+Using variables and other techniqiues PayPoint allows users to have money, transfer it and spend it/
+
+=== Planned Features ===
+
+* Suggest something!
+
+=== Known Bugs ===
+
+* Please report them directly to me or nfell2009
+
+=== Changelog ===
+
+*+ = Something added
+*- = Something removed
+
+Update: v1.0
+* + Created PayPoint
+
+
+=== Downloads and extra info! ===
+
+The script has been attached here and can be viewed on the GitHub page: https://github.com/nhSkript/nhSkript/blob/master/PayPoint/PayPoint.sk
+
+=== Current Version: V1.0 ===
+
+=== GitHub === 
+
+Main file: https://github.com/nhSkript/nhSkript/blob/master/PayPoint/PayPoint.sk
+
+=== Addons and scripts supporting PayPoint ===
+
+ShopSearch (http://dev.bukkit.org/bukkit-plugins/skript/forum/scripts/65497-v1-3-shop-search-skript-2-1-2/#p1) - NOTE: PayPoint support is only in v1.4. Which will be released soon

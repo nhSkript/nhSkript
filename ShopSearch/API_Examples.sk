@@ -1,0 +1,34 @@
+# Custom Economy Command
+
+command /example-command [<text>]:
+	executable by: console
+	trigger:
+		set {_pl} to arg 1 parsed as player
+		set {_pu} to uuid of {_pl}
+		set {_pr} to {ss::player::%{_pu}%::transaction::price}
+		if {example.variable.%{_pu}%} is greater than or equal to {_pr}:
+			set {_a} to {ss::player::%{_pu}%::transaction::amount}
+			set {_i} to {ss::player::%{_pu}%::transaction::item}
+			set {_p} to {ss::player::%{_pu}%::transaction::playerto}
+			set {_u} to uuid of {_p}
+			set {_sloc} to {ss::player::%{_pu}%::transaction::sign-loc}
+			set {_cloc} to {ss::player::%{_pu}%::transaction::chest-loc}
+			
+			execute console command "/ss-console remove {_i} {_a} _cloc"
+			execute console command "/ss-console give {_i} {_a} {_p}"
+			
+			subtract {_pr} from {example.variable.%{_pu}%}
+			add {_pr} to {example.variable.%{_u}%}
+			
+# Register a custom command in /ss
+
+on script load:
+	set {ss::api::customcommands::example} to "example" # Can be any value
+	set {ss::api::customcommands::example::command} to "exmaple-cmd"
+	set {ss::api::customcommands::example::arg-count} to "2" 
+	# You will get: arg 1 - arg 2
+	# Note: ShopSearch only has 4 arg slots!
+	# The command is ran as PLAYER!
+command /example-cmd [<text>] [<text>]:
+	trigger:
+		message "Hi. This is just an example! Your arg 1: %arg 1% - your arg 2: %arg 2%"

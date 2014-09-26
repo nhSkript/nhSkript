@@ -1,0 +1,172 @@
+options:
+	P: &8[&aSS&8]&a
+	MyC: &6[&eMyC&6]&e
+	uMyC: [MyC]
+	
+on join:
+	if {ss.%player%.exists} is not set:
+		set {ss.%player%.exists} to true
+		set {ss.%player%.buying} to false
+	
+command /searchshop <text> [<integer>] [<item>]:
+	description: Main SearchShop command
+	permission: searchshop.usage
+	aliases: /ss, /searchs, /sshop,
+	trigger:
+		if arg 1 is not set:
+			message "{@P} You must give a subcommand!"
+		else if arg 1 is "add":
+			message "{@P} Right click to add a chest!"
+			set {ss.%player%.add} to true
+		else if arg 1 is "remove":
+			message "{@P} Right click to remove a chest!"
+			set {ss.%player%.remove} to true
+		else if arg 1 is "buy":
+			if {ss.%player%.buying} is false:
+				message "{@P} You haven't selected anything to buy!"
+			else if {ss.%player%.buying} is true:
+				message "{@P} Your selected purchase is as follows:"
+				message "{@P} Item: %{ss.%player%.buying.item}%"
+				message "{@P} Amount: %{ss.%player%.buying.amount}%"
+				if {myc.enabled} is true:
+					if {_price} is greater than 1:
+						message "{@P} Price: %{ss.%player%.buying.price}%%{myc.currency.plural}%"
+					else:
+						message "{@P} Price: %{ss.%player%.buying.price}%%{myc.currency}%"
+				else:
+					message "{@P} Price: %{ss.%player%.buying.price}%"
+				message "{@P} From Player: %{ss.%player%.buying.playerto}%"
+			else:
+				message "{@P} Something went wrong..."
+		else if arg 1 is "confirm":
+			if {ss.%player%.buying} is true:
+				if block at {ss.%player%.buying.chestloc} contains {ss.%player%.buying.amount} of {ss.%player%.buying.item}:
+					if {myc.enabled} is true:
+						if {myc.%player%.money} is greater than or equal to {ss.%player%.buying.price}:
+							remove {ss.%player%.buying.amount} of {ss.%player%.buying.item} from block at {ss.%player%.buying.chestloc}
+							give {ss.%player%.buying.amount} of {ss.%player%.buying.item} to player
+							subtract {ss.%player%.buying.price} from {myc.%player%.money}
+							set {myc.%player%.lastpayto} to {ss.%player%.buying.playerto}
+							set {myc.%player%.lastpayout} to {ss.%player%.buying.price}
+							add {ss.%player%.buying.price} to {myc.%{ss.%player%.buying.playerto}%.money}
+							set {myc.%{ss.%player%.buying.playerto}%.lastpayin} to {ss.%player%.buying.price}
+							set {myc.%{ss.%player%.buying.playerto}%.lastpayfrom} to player
+							if {_price} is greater than 1:
+								message "{@P} You just bought %{ss.%player%.buying.amount}% %{ss.%player%.buying.item}% from %{ss.%player%.buying.playerto}% for %{ss.%player%.buying.price}%%{myc.currency.plural}%"
+								log "{@uMyC} %player% bought %{ss.%player%.buying.amount}% %{ss.%player%.buying.item}% from %{ss.%player%.buying.playerto}% for %{ss.%player%.buying.price}%%{myc.currency.plural}%" to "myc/%player%"
+								log "{@uMyC} %player% bought bought %{ss.%player%.buying.amount}% %{ss.%player%.buying.item}% from %{ss.%player%.buying.playerto}% for %{ss.%player%.buying.price}%%{myc.currency.plural}%" to "myc/%{ss.%player%.buying.playerto}%"
+							else:
+								message "{@P} You just bought %{ss.%player%.buying.amount}% %{ss.%player%.buying.item}% from %{ss.%player%.buying.playerto}% for %{ss.%player%.buying.price}%%{myc.currency}%"
+								log "{@uMyC} %player% bought %{ss.%player%.buying.amount}% %{ss.%player%.buying.item}% from %{ss.%player%.buying.playerto}% for %{ss.%player%.buying.price}%%{myc.currency}%" to "myc/%player%"
+								log "{@uMyC} %player% bought %{ss.%player%.buying.amount}% %{ss.%player%.buying.item}% from %{ss.%player%.buying.playerto}% for %{ss.%player%.buying.price}%%{myc.currency}%" to "myc/%{ss.%player%.buying.playerto}%"
+							set {ss.%player%.buying} to false
+							delete {ss.%player%.buying.chestloc}
+							delete {ss.%player%.buying.itemname}
+							delete {ss.%player%.buying.amount}
+							delete {ss.%player%.buying.price}
+							delete {ss.%player%.buying.playerto}
+						else:
+							message "{@MyC} Your funds don't support that purchase!"
+					else:
+						if player's balance is greater than or equal to {_price}:
+							remove arg-2 of arg-3 from block at loop-value
+							give arg-2 of arg-3 to player
+							subtract {_price} from player's balance
+							add {_price} to {_playerto}'s balance
+							message "{@P} You just bought %arg-2% %arg-3% from %{_playerto}% for %{_price}%"
+				else:
+					message "{@P} There was an error trying to see if the chest contains the items! Try again or contact the shop owner."
+			else:
+				message "{@P} There is nothing for you too buy!"
+		else if {ss.%arg 1%.exists} is true:
+			if arg 2 is not set:
+				message "{@P} You must enter an item amount you want!"
+				stop trigger
+			else if arg 3 is not set:
+				message "{@P} You must enter the item you want!"
+				stop trigger
+			else if arg 2 is not number:
+				message "{@P} You must enter the amount as a number!"
+			else:
+				set {_counter} to 0
+				loop {ss.%arg 1%.chests::*}:
+					add 1 to {_counter}
+					if block at loop-value is chest:
+						if block at loop-value contains arg-2 of arg-3:
+							set {_x} to x coordinate of loop-value
+							set {_y} to y coordinate of loop-value
+							set {_z} to z coordinate of loop-value
+							add 1 to {_y}
+							set {_cloc} to location at {_x}, {_y}, {_z}
+							if block at {_cloc} is sign:
+								if line 1 of block at {_cloc} is set:
+									if line 2 of block at {_cloc} is set:
+										if line 3 of block at {_cloc} is set:
+											if line 4 of block at {_cloc} is set:
+												set {_wamount} to arg-2
+												set {_witem} to arg-3
+												set {_playerto} to line 1 of block at {_cloc} parsed as player
+												set {_amount} to line 2 of block at {_cloc} parsed as number
+												set {_price} to line 3 of block at {_cloc} parsed as number
+												set {_itemname} to line 4 of block at {_cloc} parsed as text
+												if {_wamount} is equal to {_amount}:
+													if "%{_witem}%" is equal to "%{_itemname}%":
+														set {ss.%player%.buying.amount} to line 2 of block at {_cloc} parsed as number
+														set {ss.%player%.buying} to true
+														subtract 1 from {_y}
+														set {ss.%player%.buying.chestloc} to location at {_x}, {_y}, {_z}
+														set {ss.%player%.buying.item} to {_itemname} parsed as item
+														set {ss.%player%.buying.price} to {_price}
+														set {ss.%player%.buying.playerto} to {_playerto}
+														message "{@P} You have now selected the following for purchase:"
+														message "{@P} Item: %{ss.%player%.buying.item}%"
+														message "{@P} Amount: %{ss.%player%.buying.amount}%"
+														if {myc.enabled} is true:
+															if {_price} is greater than 1:
+																message "{@P} Price: %{ss.%player%.buying.price}%%{myc.currency.plural}%"
+															else:
+																message "{@P} Price: %{ss.%player%.buying.price}%%{myc.currency}%"
+														else:
+															message "{@P} Price: %{ss.%player%.buying.price}%"
+														message "{@P} From Player: %{ss.%player%.buying.playerto}%"
+														message "{@P} Do: /ss confirm - to buy this. You can review this purchase at any time by doing: /ss buy"
+														stop loop
+		else:
+			message "{@P} Unknown command!"
+on rightclick on chest:
+	if {ss.%player%.add} is true:
+		loop blocks 1 above block:
+			if loop-block is sign:
+				line 1 of loop-block is "%player%":
+					set {_x} to x coordinate of block
+					set {_y} to y coordinate of block
+					set {_z} to z coordinate of block
+					set {_ss.x} to floor({_x})
+					set {_ss.y} to floor({_y})
+					set {_ss.z} to floor({_z})
+					set {_ss.cloc} to location at {_ss.x}, {_ss.y}, {_ss.z}
+					add {_ss.cloc} to {ss.%player%.chests::*}
+					message "{@P} Added: %{_ss.cloc}%"
+					cancel event
+					set {ss.%player%.add} to false
+				else:
+					message "{@P} It needs to be your shop!"
+					cancel event
+	else if {ss.%player%.remove} is true:
+		loop blocks 1 above block:
+			if loop-block is sign:
+				line 1 of loop-block is "%player%":
+					set {_x} to x coordinate of block
+					set {_y} to y coordinate of block
+					set {_z} to z coordinate of block
+					set {_ss.x} to floor({_x})
+					set {_ss.y} to floor({_y})
+					set {_ss.z} to floor({_z})
+					set {_ss.cloc} to location at {_ss.x}, {_ss.y}, {_ss.z}
+					remove {_ss.cloc} from {ss.%player%.chests::*}
+					message "{@P} Removed: %{_ss.cloc}%"
+					cancel event
+					set {ss.%player%.remove} to false
+				else:
+					message "{@P} It needs to be your shop!"
+					cancel event
