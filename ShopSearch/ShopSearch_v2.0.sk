@@ -65,10 +65,86 @@ on join:
 		set {ss::setting::playerlist::%player%} to player
 	if {ss::player::%uuid of player%::lastplayer} is not player:
 		set {_p} to {ss::player::%uuid of player%::lastplayer} parsed as player
-		loop {ss::player::%uuid of player%chests::*}:
+		loop {ss::player::%uuid of player%::chests::*}:
 			set {_loc} to loop-value
+			if {ss::quickshop::%loop-value%} is set:
+				set {_c} to {ss::quickshop::%loop-value%}
+				set {ss::quickshop::%{_c}%::playerto} to player
+			set {McCS.ChestOwner.%loop-value%} to player
 			add 1 to y coord of {_loc}
+			set {McCS.Owner.%{_loc}%} to player
 			set line 1 of block at {_loc} to "%player%"
+			
+command /ss-admin [<text>] [<text>] [<text>]:
+	description: SearchShop Admin
+	permission: shopsearch.admin
+	trigger:
+		if arg 1 is not set:
+			message "{@P} Type /ss-admin help - for help"
+		if arg 1 is "help":
+			message "{@P} ShopSearch admin command help"
+			message "{@P} /ss-admin delete <user> - Deletes a user's shops"
+			message "{@P} /ss-admin clearall <user> - Removes the users shops AND the chest/sign blocks"
+			message "{@P} /ss-admin convert <user from> <user to> - Converts a chest of a user to another's"
+		else if arg 1 is "delete":
+			if arg 2 is set:
+				set {_p} to arg 2 parsed as player
+				set {_uuid} to uuid of {_p}
+				if {ss::player::%{_u}%::exists} is true:
+					if {ss::player::%{_u}%::chests::*} is not empty:
+						set {_s} to size of {ss::player::%{_u}%::chests::*}
+						delete {ss::player::%{_u}%::chests::*}
+						message "{@P} Deleted %{_p}%'s shops (%{_s}%)"
+					else:
+						message "{@P} %{_p}% has no shops"
+				else:
+					message "{@P} That user doesn't exist"
+			else:
+				message "{@P} You must provide a player's name to remove."
+		else if arg 1 is "clearall":
+			if arg 2 is set:
+				set {_p} to arg 2 parsed as player
+				set {_uuid} to uuid of {_p}
+				if {ss::player::%{_u}%::exists} is true:
+					if {ss::player::%{_u}%::chests::*} is not empty:
+						loop {ss::player::%{_u}%::chests::*}:
+							set {_loc} to loop-value
+							set block at {_loc} to air
+							add 1 to y coord of {_loc}
+							set block at {_loc} to air
+							add 1 to {_num}
+						message "{@P} Cleared %{_p}%'s shops (%{_num}%/%size of {ss::player::%{_u}%::chests::*}%)"
+						delete {ss::player::%{_u}%::chests::*}
+					else:
+						message "{@P} %{_p}% has no shops"
+				else:
+					message "{@P} That user doesn't exist"
+			else:
+				message "{@P} You must provide a players name to clear"
+		else if arg 1 is "convert":
+			if arg 2 is set:
+				if arg 3 is set:
+					set {_p} to arg 2 parsed as offline player
+					set {_u} to uuid of {_p}
+					set {_p2} to arg 3 parsed as offline player
+					set {_u2} to uuid of {_p2}
+					if {ss::player::%{_u}%::exists} is true:
+						message "{@P} Converting chests for: %arg 2% to %arg 3%"
+						loop {ss::player::%{_u}%::chests::*}:
+							add loop-value to {ss::player::%{_u2}%::chests}
+							set {_loc} to loop-value
+							if {ss::quickshop::%loop-value%} is set:
+								set {_c} to {ss::quickshop::%loop-value%}
+								set {ss::quickshop::%{_c}%::playerto} to player
+							set {McCS.ChestOwner.%loop-value%} to player
+							add 1 to y coord of {_loc}
+							set {McCS.Owner.%{_loc}%} to player
+							set line 1 of block at {_loc} to "%player%"
+							add 1 to {_num}
+						message "{@P} Successfully converted chests from %arg 2% to %arg 3% (%{_num}%/%size of {ss::player::%{_u}%::chests}%/%size of {ss::player::%{_u2}%::chests}%)"
+						delete {ss::player::%{_u}%::chests}
+					else:
+						message "{@P} Player: %{_p}% doesn't exist!"
 				
 command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
