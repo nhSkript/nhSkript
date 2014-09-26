@@ -164,6 +164,12 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						set {_c} to {ss::quickshop::%loop-value%}
 				message "{@P} Best Shop: Sales - %{_n}% QuickShop - %{_c}% - Location - %{_l}%"]
 				message "{@P} Total Sales: %{_co}%
+			else if arg 2 is "shopsearch" or "ss":
+				message "{@P} About ShopSearch:"
+				message "{@P} Script: %script%"
+				set {_s::*} to script split at "_"
+				message "{@P} Version: %{_s::2}%"
+				message "{@P} ShopSearch is developed by nfell2009 and HoneyBuzzard. Its a powerful script allowing the user to use a command to search a users set shops and buy from them without having to visit that shop"
 		else if arg 1 is "menu":
 			if arg 2 is set:
 				set {_p} to arg 2 parsed as player
