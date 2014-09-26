@@ -71,6 +71,12 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 			else:
 				set {ss::player::%uuid of player%::setting::rev-num} to "unlimited"
 			message "{@P} You can now remove: %{ss::player::%uuid of player%::setting::rev-num}% chests!"
+			set {ss::player::%uuid of player%::setting::c-m} to "remove"
+		else if arg 1 is "cancel":
+			delete {ss::player::%uuid of player%::setting::c-m}
+			delete {ss::player::%uuid of player%::setting::rev-num}
+			delete {ss::player::%uuid of player%::setting::add-num}
+			message "{@P} Cancelled adding/removing a chest."
 		else if arg 1 is "shop":
 			if arg 2 is set:
 				if arg 3 is set:
@@ -299,37 +305,18 @@ command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>]:
 				
 
 on rightclick on chest:
-	if {ss::player::%uuid of player%::setting::add} is true:
+	if {ss::player::%uuid of player%::setting::c-m} is "add":
 		cancel event
-		if {ss::player::%uuid of player%::setting::add-num} is not set:
+		if {ss::player::%uuid of player%::setting::add-num} is set:
 			if {ss::player::%uuid of player%::chests::%location of block%} is not set:
-				set {_b} to block above location of block
-				if {_b} is sign:
-					if line 1 of {_b} is "%player%" or "[Chest Shop]":
-						set {ss::player::%uuid of player%::chests::%location of block%} to location of block
-						message "{@P} Added chest! (%location of block%)
-						delete {ss::player::%uuid of player%::setting::add-num}
-						if {@QuickShop} is true:
-							execute console command "/codegenapi g c %{ss.codegenapi.key}% %player% 4"
-							set {_c} to {cga.%{ss::settings::cga-key}%.%player%.code}
-							set {ss::quickshop::%{_c}%} to location of block
-							set {ss::quickshop::%location of block%} to {_c}
-							set {ss::quickshop::%{_c}%::playerto} to player
-							set {ss::quickshop::%{_c}%::amount} to line 2 of {_b} parsed as number
-							set {_price::*} to line 3 of {_b} split at ":"
-							replace all "B" and " " in {_price::1} with ""
-							set {ss::quickshop::%{_c}%::price} to {_price::1} parsed as number
-							set {ss::quickshop::%{_c}%::item} to line 4 of {_b} parsed as item
-							message "{@P} Users can do /ss quickshop %{_c}% - to quickly buy from this shop!"
-		else:
-			if {ss::player::%uuid of player%::chests::%location of block%} is not set:
-				set {_b} to block above location of block
+				set {_b} to block above event-block
 				if {_b} is sign:
 					if line 1 of {_b} is "%player%" or "[Chest Shop]":
 						set {ss::player::%uuid of player%::chests::%location of block%} to location of block
 						message "{@P} Added chest! (%location of block%)
 						if {ss::player::%uuid of player%::setting::add-num} is 1:
 							delete {ss::player::%uuid of player%::setting::add-num}
+							delete {ss::player::%uuid of player%::setting::c-m}
 						else if {ss::player::%uuid of player%::setting::add-num} is not "unlimited":
 							subtract 1 from {ss::player::%uuid of player%::setting::add-num}
 						if {@QuickShop} is true:
@@ -345,4 +332,12 @@ on rightclick on chest:
 							set {ss::quickshop::%{_c}%::item} to line 4 of {_b} parsed as item
 							delete {ss::player::%uuid of player%::setting::add-num}
 							message "{@P} Users can do /ss quickshop %{_c}% - to quickly buy from this shop!"
-								
+	else if {ss::player::%uuid of player%::setting::c-m} is "remove":
+		cancel event
+		if {ss::player::%uuid of player%::setting::rev-num} is set:
+			if {ss::player::%uuid of player%::chests::%location of block%} is set:
+				delete {ss::player::%uuid of player%::chests::%location of block%}
+				if {ss::quickshop::%location of block%} is set:
+					set {_c} to {ss::quickshop::%location of block%}
+					delete {ss::quickshop::%{_c}%::*}
+					delete {ss::quickshop::%location of block%}
