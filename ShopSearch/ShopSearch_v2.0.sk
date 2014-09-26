@@ -15,6 +15,7 @@ options:
 	CE-Command-Check2: false
 	CE-Command-Add: false
 	QuickShop: false
+	B-C: false
 
 on script load:
 	if {ss::setting::converted} is not true:
@@ -50,6 +51,9 @@ on script load:
 	if {ss::settings::cga-key} is not set:
 		execute console command "/codegenapi g k shopsearch_v2.0"
 		set {ss::settings::cga-key} to {cga.shopsearch_v2.0.code}
+		
+on script load:
+	set {ss::setting::currency} to "£"
 				
 command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
@@ -82,6 +86,85 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
 					else:
 						format slot {_num} of player with {_i} named "&4Out of stock" with lore "&4Unfortunately this item is currently out of stock!" to be unstealable
+		else if arg 1 is "quickshop":
+			if arg 2 is set:
+				if {ss::quickshop::%arg 2%} is set:
+					set {_c} to arg 2
+					set {_loc} to {ss::quickshop::%{_c}%}
+					add 1 to y coord of {_loc}
+					set {_a} to {ss::quickshop::%{_c}%::amount}
+					set {_i} to {ss::quickshop::%{_c}%::item}
+					set {_p} to {ss::quickshop::%{_c}%::playerto}
+					set {_l3} to {ss::quickshop::%{_c}%::price}
+					message "{@P} Item: %{_i}%"
+					message "{@P} Amount: %{_a}%"
+					message "{@P} Price: %{_l3}%"
+					message "{@P} Buying from: %{_p}%"
+					send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase"
+				else:
+					message "{@P} Invalid code"
+			else:
+				message "{@P} You must provide a code"
+		else if arg 1 is "stats":
+			if arg 2 is "help":
+				message "{@P} Stats help:"
+				message "{@P} /ss stats shops - Lists number of shops"
+				message "{@P} /ss stats money - Total money that has been sent in SS"
+				message "{@P} /ss stats items - Best selling items"
+				message "{@P} /ss ststs users - Most selling users"
+			if arg 2 is "shops":
+				loop {ss::setting::playerlist::*}:
+					add size of {ss::player::%uuid of loop-value%::chests} to {_count}
+				if {_count} is not set:
+					set {_count} to 0
+				message "{@P} There are currently: %{_count}% shops!"
+			else if arg 2 is "money":
+				if {ss::global::totalmoney} is not set:
+					set {ss::global::totalmoney} to 0
+				if {@B-C} is true:
+					message "{@P} A total of: %{ss::setting::currency}%%{ss::global::totalmoney}% has been sent using ShopSearch"
+				else:
+					message "{@P} A total of: %{ss::global::totalmoney}%%{ss::setting::currency}% has been sent using ShopSearch"
+			else if arg 2 is "items":
+				if {ss::stats::itm::*} is empty:
+					message "{@P} There are no top selling items."
+					stop
+				else if {ss::stats::num::*} is empty:
+					message "{@P} There are no top selling items."
+					stop
+				message "{@P} Top selling items:"
+				loop {ss::stats::itm::*}:
+					add 1 to {_num}
+					set {_item-%{_num}%} to {ss::stats::num::%loop-value%}
+					if {_num} = 10:
+						exit
+				loop {ss::stats::itm::*}:
+					loop 10 times:
+						add 1 to {_cou}
+						if {ss.itemlist-num::%loop-value%} > {_item-%{_num}%}:
+							set {_output-list::%{_num}%} to "%loop-value% - %{ss::stats::num::%loop-value%}%"
+				loop {_output-list::*}:
+					message "{@P} %loop-value%"
+			else if arg 2 is "users":
+				if {ss::stats::playersales::p::*} is empty:
+					message "{@P} There are no top selling players."
+					stop
+				else if {ss::stats::playersales::n::*} is empty:
+					message "{@P} There are no top selling players."
+					stop
+				message "{@P} Top selling players:"
+				loop {ss::stats::playersales::p::*}:
+					add 1 to {_num}
+					set {_item-%{_num}%} to {ss::stats::playersales::p::%loop-value%}
+					if {_num} = 10:
+						exit
+				loop {ss::stats::playersales::p::*}:
+					loop 10 times:
+						add 1 to {_cou}
+						if {ss::stats::playersales::n::*} > {_item-%{_num}%}:
+							set {_output-list::%{_num}%} to "%loop-value% - %{ss::stats::playersales::n::%loop-value%}%"
+				loop {_output-list::*}:
+					message "{@P} %loop-value%"
 		else if arg 1 is "add":
 			if arg 2 is not set:
 				set {ss::player::%uuid of player%::setting::add-num} to 1
