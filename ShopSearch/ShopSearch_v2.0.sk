@@ -13,7 +13,7 @@ options:
 	CE-Command-Check: false
 	CE-Command-Check2: false
 	CE-Command-Add: false
-	QuickShop: true
+	QuickShop: false
 
 on script load:
 	if {ss::setting::converted} is not true:
@@ -40,13 +40,15 @@ on script load:
 				set {ss::player::%uuid of loop-value%::buying} to false
 				set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
 				add loop-value to {ss::setting::playerlist::*}
-				set {_u} to uuid of loop-value
-			loop {ss.itemlist-itm::*}:
-				set {ss::stats::itm::%loop-value%} to loop-value
-				set {ss::stats::num::%loop-value%} to {ss.itemlist-num::%loop-value%}
-			loop {ss.playersales-p::*}:
-				set {ss::stats::playersales::p::%loop-value%} to loop-value
-				set {ss::stats::playersales::n::%loop-value%} to {ss.playersales-n::%loop-value%}
+		loop {ss.itemlist-itm::*}:
+			set {ss::stats::itm::%loop-value%} to loop-value
+			set {ss::stats::num::%loop-value%} to {ss.itemlist-num::%loop-value%}
+		loop {ss.playersales-p::*}:
+			set {ss::stats::playersales::p::%loop-value%} to loop-value
+			set {ss::stats::playersales::n::%loop-value%} to {ss.playersales-n::%loop-value%}
+	if {ss::settings::cga-key} is not set:
+		execute console command "/codegenapi g k shopsearch_v2.0"
+		set {ss::settings::cga-key} to {cga.shopsearch_v2.0.code}
 				
 command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
@@ -54,7 +56,21 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 		if arg 1 is not set:
 			message "{@P} Do /ss help - for help"
 		else if arg 1 is "add":
-			
+			if arg 2 is not set:
+				set {ss::player::%uuid of player%::setting::add-num} to 1
+			else if arg 2 is "unlimited":
+				set {ss::player::%uuid of player%::setting::add-num} to arg 2 parsed as integer
+			else:
+				set {ss::player::%uuid of player%::setting::add-num} to "unlimited"
+			message "{@P} You can now add: %{ss::player::%uuid of player%::setting::add-num}% chests!"
+		else if arg 1 is "remove":
+			if arg 2 is not set:
+				set {ss::player::%uuid of player%::setting::rev-num} to 1
+			else if arg 2 is "unlimited":
+				set {ss::player::%uuid of player%::setting::rev-num} to arg 2 parsed as integer
+			else:
+				set {ss::player::%uuid of player%::setting::rev-num} to "unlimited"
+			message "{@P} You can now remove: %{ss::player::%uuid of player%::setting::rev-num}% chests!"
 		else if arg 1 is "shop":
 			if arg 2 is set:
 				if arg 3 is set:
@@ -281,3 +297,52 @@ command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>]:
 			set {_p} to arg 3 parsed as player
 			give {_a} of {_i} to {_p}
 				
+
+on rightclick on chest:
+	if {ss::player::%uuid of player%::setting::add} is true:
+		cancel event
+		if {ss::player::%uuid of player%::setting::add-num} is not set:
+			if {ss::player::%uuid of player%::chests::%location of block%} is not set:
+				set {_b} to block above location of block
+				if {_b} is sign:
+					if line 1 of {_b} is "%player%" or "[Chest Shop]":
+						set {ss::player::%uuid of player%::chests::%location of block%} to location of block
+						message "{@P} Added chest! (%location of block%)
+						delete {ss::player::%uuid of player%::setting::add-num}
+						if {@QuickShop} is true:
+							execute console command "/codegenapi g c %{ss.codegenapi.key}% %player% 4"
+							set {_c} to {cga.%{ss::settings::cga-key}%.%player%.code}
+							set {ss::quickshop::%{_c}%} to location of block
+							set {ss::quickshop::%location of block%} to {_c}
+							set {ss::quickshop::%{_c}%::playerto} to player
+							set {ss::quickshop::%{_c}%::amount} to line 2 of {_b} parsed as number
+							set {_price::*} to line 3 of {_b} split at ":"
+							replace all "B" and " " in {_price::1} with ""
+							set {ss::quickshop::%{_c}%::price} to {_price::1} parsed as number
+							set {ss::quickshop::%{_c}%::item} to line 4 of {_b} parsed as item
+							message "{@P} Users can do /ss quickshop %{_c}% - to quickly buy from this shop!"
+		else:
+			if {ss::player::%uuid of player%::chests::%location of block%} is not set:
+				set {_b} to block above location of block
+				if {_b} is sign:
+					if line 1 of {_b} is "%player%" or "[Chest Shop]":
+						set {ss::player::%uuid of player%::chests::%location of block%} to location of block
+						message "{@P} Added chest! (%location of block%)
+						if {ss::player::%uuid of player%::setting::add-num} is 1:
+							delete {ss::player::%uuid of player%::setting::add-num}
+						else if {ss::player::%uuid of player%::setting::add-num} is not "unlimited":
+							subtract 1 from {ss::player::%uuid of player%::setting::add-num}
+						if {@QuickShop} is true:
+							execute console command "/codegenapi g c %{ss.codegenapi.key}% %player% 4"
+							set {_c} to {cga.%{ss::settings::cga-key}%.%player%.code}
+							set {ss::quickshop::%{_c}%} to location of block
+							set {ss::quickshop::%location of block%} to {_c}
+							set {ss::quickshop::%{_c}%::playerto} to player
+							set {ss::quickshop::%{_c}%::amount} to line 2 of {_b} parsed as number
+							set {_price::*} to line 3 of {_b} split at ":"
+							replace all "B" and " " in {_price::1} with ""
+							set {ss::quickshop::%{_c}%::price} to {_price::1} parsed as number
+							set {ss::quickshop::%{_c}%::item} to line 4 of {_b} parsed as item
+							delete {ss::player::%uuid of player%::setting::add-num}
+							message "{@P} Users can do /ss quickshop %{_c}% - to quickly buy from this shop!"
+								
