@@ -17,7 +17,7 @@ options:
 	QuickShop: false
 	B-C: false
 	GiftCard-Payment: false
-	AllowGlobal: false #This may cause lag if the playerlist gets big
+	AllowGlobal: false # This may cause lag if the playerlist gets big
 
 on script load:
 	if {ss::setting::converted} is not true:
