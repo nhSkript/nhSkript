@@ -17,6 +17,7 @@ options:
 	QuickShop: false
 	B-C: false
 	GiftCard-Payment: false
+	AllowGlobal: false #This may cause lag if the playerlist gets big
 
 on script load:
 	if {ss::setting::converted} is not true:
@@ -65,7 +66,7 @@ on join:
 	if {ss::setting::playerlist::%player%} is not set:
 		set {ss::setting::playerlist::%player%} to player
 	if {ss::player::%uuid of player%::lastplayer} is not player:
-		set {_p} to {ss::player::%uuid of player%::lastplayer} parsed as player
+		set {_p} to {ss::player::%uuid of player%::lastplayer} parsed as offline player
 		loop {ss::player::%uuid of player%::chests::*}:
 			set {_loc} to loop-value
 			if {ss::quickshop::%loop-value%} is set:
@@ -80,16 +81,35 @@ command /ss-admin [<text>] [<text>] [<text>]:
 	description: SearchShop Admin
 	permission: shopsearch.admin
 	trigger:
+		if {ss::player::%uuid of player%::blocked} is true:
+			message "{@P} Your ShopSearch account has been blocked. Please contact a member of the staff team if you think this is a problem."
+			stop
 		if arg 1 is not set:
-			message "{@P} Type /ss-admin help - for help"
-		if arg 1 is "help":
+			make player execute command "/ss-admin help"
+		else if arg 1 is "help":
 			message "{@P} ShopSearch admin command help"
 			message "{@P} /ss-admin delete <user> - Deletes a user's shops"
 			message "{@P} /ss-admin clearall <user> - Removes the users shops AND the chest/sign blocks"
 			message "{@P} /ss-admin convert <user from> <user to> - Converts a chest of a user to another's"
+			message "{@P} /ss-admin block <player> - Blocks a player from using any ShopSearch command"
+			message "{@P} /ss-admin unblock <player> - Unblocks a player - allows them to use ShopSearch commands again"
+		else if arg 1 is "block":
+			if arg 2 is set:
+				if arg 3 is set:
+					set {_p} to arg 2 parsed as offline player
+					if {ss::player::%uuid of {_p}::exists} is true:
+						set {ss::player::%uuid of {_p}%::blocked} to true
+						message "{@P} You have blocked: %{_p}%'s access to ShopSearch!"
+		else if arg 1 is "unblock":
+			if arg 2 is set:
+				if arg 3 is set:
+					set {_p} to arg 2 parsed as offline player
+					if {ss::player::%uuid of {_p}::exists} is true:
+						set {ss::player::%uuid of {_p}%::blocked} to false
+						message "{@P} You have unblocked: %{_p}%'s access to ShopSearch!"
 		else if arg 1 is "delete":
 			if arg 2 is set:
-				set {_p} to arg 2 parsed as player
+				set {_p} to arg 2 parsed as offline player
 				set {_uuid} to uuid of {_p}
 				if {ss::player::%{_u}%::exists} is true:
 					if {ss::player::%{_u}%::chests::*} is not empty:
@@ -104,7 +124,7 @@ command /ss-admin [<text>] [<text>] [<text>]:
 				message "{@P} You must provide a player's name to remove."
 		else if arg 1 is "clearall":
 			if arg 2 is set:
-				set {_p} to arg 2 parsed as player
+				set {_p} to arg 2 parsed as offline player
 				set {_uuid} to uuid of {_p}
 				if {ss::player::%{_u}%::exists} is true:
 					if {ss::player::%{_u}%::chests::*} is not empty:
@@ -150,6 +170,9 @@ command /ss-admin [<text>] [<text>] [<text>]:
 command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 	permission: ss.admin
 	trigger:
+		if {ss::player::%uuid of player%::blocked} is true:
+			message "{@P} Your ShopSearch account has been blocked. Please contact a member of the staff team if you think this is a problem."
+			stop
 		if arg 1 is not set:
 			message "{@P} Do /ss help - for help"
 		else if arg 1 is "about":
@@ -299,10 +322,63 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 			delete {ss::player::%uuid of player%::setting::add-num}
 			message "{@P} Cancelled adding/removing a chest."
 		else if arg 1 is "shop":
-			if arg 2 is set:
+			if arg 2 is "g" or "global":
+				if {@AllowGlobal} is true:
+					if arg 3 is set:
+						if arg 4 is set:
+							set {_i} to arg 3 parsed as item
+							set {_a} to arg 4 parsed as number
+							if {_a} contains ".":
+								set {_ar::*} to {_a} split at "."
+								set {_a} to {_ar::1}
+								message "{@P} You can only have an integer for the amount! ShopSearch has converted: %{_ar::2}% to %{_a}%"
+							set {_shops} to 0
+							set {_users} to 0
+							set {ss::player::%uuid of player%::startedsearch} to now
+							loop {ss::setting::playerlist::*}:
+								add 1 to {_users}
+								loop {ss::player::%uuid of loop-value%::chests::*}:
+									add 1 to {_shops}
+									set {_loc} to loop-value
+									set {_bloc} to loop-value
+									add 1 to y coord of {_loc}
+									if block at {_loc} is sign:
+										set {_b} to block at {_loc}
+									if line 1 of {_b} is "[Chest Shop]":
+										set {_p} to {McCS.Owner.%{_loc}%}
+										set {_t} to true
+									else if line 1 of {_b} is {_p}:
+										set {_t} to true
+									if {_t} is true:
+										if line 2 of {_b} is {_a}:
+											if block at {_bloc} contains {_a} of {_i}:
+												if line 4 of {_b} is {_i}:
+													set {_l3} to line 3 of {_b}
+													set {_arr::*} to {_l3} split at ":"
+													set {_l3} to {_arr::1}
+													replace all "B" and " " in {_l3} with ""
+													set {ss::player::%uuid of player%::transaction::buying} to true
+													set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
+													set {ss::player::%uuid of player%::transaction::chest-loc} to {_bloc}
+													set {ss::player::%uuid of player%::transaction::amount} to {_a}
+													set {ss::player::%uuid of player%::transaction::item} to {_i}
+													set {ss::player::%uuid of player%::transaction::playerto} to {_p}
+													set {ss::player::%uuid of player%::transaction::price} to {_l3}
+													message "{@P} ShopSearch has found a perfect match for you!"
+													message "{@P} Item: %{_i}%"
+													message "{@P} Amount: %{_a}%"
+													message "{@P} Price: %{_l3}%"
+													message "{@P} Buying from: %{_p}%"
+													send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
+													exit
+							message "{@P} Stats about this search..."
+							message "{@P} ShopSearch checked: %{_users}%/%size of {ss::setting::playerlist::*}% users"
+							message "{@P} ShopSearch checked: %{_shops}% shops"
+							message "{@P} This search has taken: %difference between now and {ss::player::%uuid of player%::startedsearch}%"
+			else if arg 2 is set:
 				if arg 3 is set:
 					if arg 4 is set:
-						set {_p} to arg 2 parsed as player
+						set {_p} to arg 2 parsed as offline player
 						set {_i} to arg 3 parsed as item
 						set {_a} to arg 4 parsed as number
 						set {_u} to uuid of {_p}
@@ -533,10 +609,10 @@ command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text
 		else if arg 1 is "give":
 			set {_i} to arg 1 parsed as item
 			set {_a} to arg 2 parsed as integer
-			set {_p} to arg 3 parsed as player
+			set {_p} to arg 3 parsed as offline player
 			give {_a} of {_i} to {_p}
 		else if arg 1 is "menu":
-			set {_p} to arg 2 parsed as player
+			set {_p} to arg 2 parsed as offline player
 			set {_u} to uuid of {_p}
 			send "{@P} We're preparing your shopping experience..." to {_p}
 			set {ss::player::%{_u}%::transaction::buying} to true
@@ -558,11 +634,11 @@ command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text
 			message "{@P} Buying from: %{ss::player::%{_u}%::transaction::playerto}%"
 			send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
 		else if arg 1 is "quickshop":
-			set {_p} to arg 2 parsed as player
+			set {_p} to arg 2 parsed as offline player
 			set {_c} to arg 3
 			make {_p} execute command "/ss quickshop %{_c}%"
 		else:
-			set {_p} to arg 2 parsed as player
+			set {_p} to arg 2 parsed as offline player
 			message "{@P} There was an error" to {_p}
 			
 				
