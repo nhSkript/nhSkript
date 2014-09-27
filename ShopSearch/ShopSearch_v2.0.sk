@@ -16,6 +16,7 @@ options:
 	CE-Command-Add: false
 	QuickShop: false
 	B-C: false
+	GiftCard-Payment: false
 
 on script load:
 	if {ss::setting::converted} is not true:
@@ -28,10 +29,10 @@ on script load:
 		if {ss.playerlist::*} is not empty:
 			loop {ss.playerlist::*}:
 				loop {ss.%loop-value%.chests::*}:
-					add loop-value-2 to {ss::player::%uuid of loop-value%::chests::*}
-					set {_c} to {ss.quickshop.%loop-value%}
-					set {ss::quickshop::%{_c}%} to loop-value
-					set {ss::quickshop::%loop-value%} to {_c}
+					add loop-value-2 to {ss::player::%uuid of loop-value-1%::chests::*}
+					set {_c} to {ss.quickshop.%loop-value-2%}
+					set {ss::quickshop::%{_c}%} to loop-value-2
+					set {ss::quickshop::%loop-value-2%} to {_c}
 					set {ss::quickshop::%{_c}%::playerto} to {ss.quickshop.details.%{_c}%::playerto}
 					set {ss::quickshop::%{_c}%::amount} to {ss.quickshop.details.%{_c}%::amount}
 					set {ss::quickshop::%{_c}%::price} to {ss.quickshop.details.%{_c}%::price}
@@ -41,7 +42,7 @@ on script load:
 				set {ss::player::%uuid of loop-value%::exists} to true
 				set {ss::player::%uuid of loop-value%::buying} to false
 				set {ss::player::%uuid of loop-value%::last-player} to {ss.%uuid of loop-value%.lastplayer}
-				set {ss::setting::playerlist::%player%} to player
+				set {ss::setting::playerlist::%uuid of loop-value%} to loop-value
 		loop {ss.itemlist-itm::*}:
 			set {ss::stats::itm::%loop-value%} to loop-value
 			set {ss::stats::num::%loop-value%} to {ss.itemlist-num::%loop-value%}
@@ -141,7 +142,7 @@ command /ss-admin [<text>] [<text>] [<text>]:
 							set {McCS.Owner.%{_loc}%} to player
 							set line 1 of block at {_loc} to "%player%"
 							add 1 to {_num}
-						message "{@P} Successfully converted chests from %arg 2% to %arg 3% (%{_num}%/%size of {ss::player::%{_u}%::chests}%/%size of {ss::player::%{_u2}%::chests}%)"
+						message "{@P} Successfully converted chests from %arg 2% to %arg 3% (%{_num}%/%size of {ss::player::%{_u}%::chests::*}%/%size of {ss::player::%{_u2}%::chests::*}%)"
 						delete {ss::player::%{_u}%::chests}
 					else:
 						message "{@P} Player: %{_p}% doesn't exist!"
@@ -162,8 +163,8 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						set {_n} to {ss::player::%uuid of player%::sales::%loop-value%}
 						set {_l} to loop-value
 						set {_c} to {ss::quickshop::%loop-value%}
-				message "{@P} Best Shop: Sales - %{_n}% QuickShop - %{_c}% - Location - %{_l}%"]
-				message "{@P} Total Sales: %{_co}%
+				message "{@P} Best Shop: Sales - %{_n}% QuickShop - %{_c}% - Location - %{_l}%"
+				message "{@P} Total Sales: %{_co}%"
 			else if arg 2 is "shopsearch" or "ss":
 				message "{@P} About ShopSearch:"
 				message "{@P} Script: %script%"
@@ -172,7 +173,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 				message "{@P} ShopSearch is developed by nfell2009 and HoneyBuzzard. Its a powerful script allowing the user to use a command to search a users set shops and buy from them without having to visit that shop"
 		else if arg 1 is "menu":
 			if arg 2 is set:
-				set {_p} to arg 2 parsed as player
+				set {_p} to arg 2 parsed as offline player
 				set {_u} to uuid of {_p}
 				set {_size} to rounded up size of {ss::player::%{_u}%::chests::*} / 9
 				open chest with {_size} rows named "&aShop of: %{_p}%" to player
@@ -193,7 +194,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						if {ss::quickshop::%{_cloc}%} is set:
 							format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %{_owner}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%||&aQuickShop Code: %{ss::quickshop::%{_cloc}%}%" to close then run "ss-console quickshop %player% %{ss::quickshop::%{_cloc}%}%"
 						else:
-							format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %{McCS.Owner.%{_loc}%}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %arg 2% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
+							format slot {_num} of player with {_i} named "&aIn stock" with lore "&aPlayer to: %{_owner}%||&aAmount: %line 2 of {_b}%||&aPrice: %line 3 of {_b}%||&aItem: %line 4 of {_b}%" to close then run "ss-console menu %player% %{_p}% %line 2 of {_b}% %line 3 of {_b}% %line 4 of {_b}% %{_cloc}%"
 					else:
 						format slot {_num} of player with {_i} named "&4Out of stock" with lore "&4Unfortunately this item is currently out of stock!" to be unstealable
 		else if arg 1 is "quickshop":
@@ -210,7 +211,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 					message "{@P} Amount: %{_a}%"
 					message "{@P} Price: %{_l3}%"
 					message "{@P} Buying from: %{_p}%"
-					send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase"
+					send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
 				else:
 					message "{@P} Invalid code"
 			else:
@@ -224,7 +225,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 				message "{@P} /ss ststs users - Most selling users"
 			if arg 2 is "shops":
 				loop {ss::setting::playerlist::*}:
-					add size of {ss::player::%uuid of loop-value%::chests} to {_count}
+					add size of {ss::player::%uuid of loop-value%::chests::*} to {_count}
 				if {_count} is not set:
 					set {_count} to 0
 				message "{@P} There are currently: %{_count}% shops!"
@@ -332,17 +333,17 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 											replace all "B" and " " in {_l3} with ""
 											set {ss::player::%uuid of player%::transaction::buying} to true
 											set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
-											set set {ss::player::%uuid of player%::transaction::chest-loc} to {_bloc}
+											set {ss::player::%uuid of player%::transaction::chest-loc} to {_bloc}
 											set {ss::player::%uuid of player%::transaction::amount} to {_a}
 											set {ss::player::%uuid of player%::transaction::item} to {_i}
 											set {ss::player::%uuid of player%::transaction::playerto} to {_p}
-											set set {ss::player::%uuid of player%::transaction::price} to {_l3}
+											set {ss::player::%uuid of player%::transaction::price} to {_l3}
 											message "{@P} ShopSearch has found a perfect match for you!"
 											message "{@P} Item: %{_i}%"
 											message "{@P} Amount: %{_a}%"
 											message "{@P} Price: %{_l3}%"
 											message "{@P} Buying from: %{_p}%"
-											send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase"
+											send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
 											exit
 						message "{@P} There were: %size of {ss::player::%{_u}%::chests::*}% shops to check. ShopSearch checked %{_counter}%/%size of {ss::player::%{_u}%::chests::*}% before finding the perfect shop"
 		else if arg 1 is "confirm":
@@ -382,7 +383,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							message "{@P} ShopSearch has used your GiftCard valued at: %{gfc::codes::%{_c}%::value}% and will now subtract funds from your bank"
 							set the player's tool to air
 							set {gfc::codes::%{_c}%::redeemed} to true
-							add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
+							add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
 						else if {gfc::codes::%{_c}%::value} is equal to {_pr}:
 							set the player's tool to air
 							set {gfc::codes::%{_c}%::redeemed} to true
@@ -409,7 +410,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 								add 1 to {ss::stats::playersales::n::%{_p}%}
 							add {_pr} to {ss::global::totalmoney}
 							delete {ss::player::%uuid of player%::transaction::*}
-							add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
+							add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
 						else if {gfc::codes::%{_c}%::value} is greater than {_pr}:
 							set the player's tool to air
 							set {gfc::codes::%{_c}%::redeemed} to true
@@ -438,7 +439,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							subtract {_pr} from {gfc::codes::%{_c}%::value}
 							give 1 of paper named "%{gfc::setting::prefix}% GiftCard - Value: %{gfc::codes::%{_c}%::value}%" with lore "&aGift Code: %{_c}%" to the player
 							delete {ss::player::%uuid of player%::transaction::*}
-							add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
+							add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
 				if {@Custom-Economy} is true:
 					execute console command "/{@CE-Command-Check}"
 				else if {myc.enabled} is true:
@@ -461,7 +462,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							add 1 to {ss::stats::playersales::n::%{_p}%}
 						add {_pr} to {ss::global::totalmoney}
 						delete {ss::player::%uuid of player%::transaction::*}
-						add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
+						add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
 					else:
 						message "{@P} Transaction failed. Please try again."
 				else if {pp::setting::running} is true:
@@ -483,7 +484,7 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						add {_pr} to {ss.%uuid of player%.buying.playerto}'s balance
 						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
 						delete {ss::player::%uuid of player%::transaction::*}
-						add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
+						add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
 					else:
 						message "{@P} You can't afford to do that"
 				else:
@@ -505,19 +506,23 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						add {_pr} to the balance of {_p}
 						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
 						delete {ss::player::%uuid of player%::transaction::*}
-						add 1 to {ss::player::%{_u}%::sales::%{_cloc%}
+						add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
 					else:
 						message "{@P} You can't afford to do that"
 		else if {ss::api::customcommands::%arg 1%} is set:
 			set {_num} to {ss::api::customcommands::%arg 1%::arg-count}
 			set {_cmd} to "%{ss::api::customcommands::%arg 1%::command}%"
-			if {_num} is not 0:
-				loop {_num} times:
-					add 1 to {_count}
-					set {_cmd} to "%{_cmd}% %arg %{_count}%%
+			if {_num} is 1:
+				set {_cmd} to "%{_cmd}% %arg 1%"		
+			else if {_num} is 2:
+				set {_cmd} to "%{_cmd}% %arg 1% %arg 2%"
+			else if {_num} is 3:
+				set {_cmd} to "%{_cmd}% %arg 1% %arg 2% %arg 3%"
+			else if {_num} is 4:
+				set {_cmd} to "%{_cmd}% %arg 1% %arg 2% %arg 3% %arg 4%"
 			make player execute command "/%{_cmd}%"
 				
-command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>]:
+command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text>]:
 	executable by: console
 	trigger:
 		if arg 1 is "remove":
@@ -534,13 +539,24 @@ command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>]:
 			set {_p} to arg 2 parsed as player
 			set {_u} to uuid of {_p}
 			send "{@P} We're preparing your shopping experience..." to {_p}
-			set {ss.%{_u}%.buying.chestloc} to arg 7
-			set {ss.%{_u}%.buying.playerto} to arg 3
-			set {ss.%{_u}%.buying.amount} to arg 4
-			set {ss.%{_u}%.buying.price} to arg 5
-			set {ss.%{_u}%.buying.item} to arg 6
-			set {ss.%{_u}%.buying} to true
-			make {_p} execute command "/ss buy"
+			set {ss::player::%{_u}%::transaction::buying} to true
+			set {ss::player::%{_u}%::transaction::playerto} to arg 3
+			set {ss::player::%{_u}%::transaction::amount} to arg 4
+			set {_pr::*} to arg 5 split at ":"
+			set {_ppr} to {_pr::1}
+			replace all "B" and " " in {_prr} with ""
+			set {ss::player::%{_u}%::transaction::price} to {_ppr}
+			set {ss::player::%{_u}%::transaction::item} to arg 6
+			set {ss::player::%{_u}%::transaction::chest-loc} to arg 7
+			set {_l} to arg 7
+			add 1 to y coord of {_l}
+			set {ss::player::%{_u}%::transaction::sign-loc} to {_l}
+			message "{@P} Checkout:"
+			message "{@P} Item: %{ss::player::%{_u}%::transaction::item}%"
+			message "{@P} Amount: %{ss::player::%{_u}%::transaction::amount}%"
+			message "{@P} Price: %{ss::player::%{_u}%::transaction::price}%"
+			message "{@P} Buying from: %{ss::player::%{_u}%::transaction::playerto}%"
+			send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
 		else if arg 1 is "quickshop":
 			set {_p} to arg 2 parsed as player
 			set {_c} to arg 3
@@ -560,7 +576,7 @@ on rightclick on chest:
 				if {_b} is sign:
 					if line 1 of {_b} is "%player%" or "[Chest Shop]":
 						set {ss::player::%uuid of player%::chests::%location of block%} to location of block
-						message "{@P} Added chest! (%location of block%)
+						message "{@P} Added chest! (%location of block%)"
 						if {ss::player::%uuid of player%::setting::add-num} is 1:
 							delete {ss::player::%uuid of player%::setting::add-num}
 							delete {ss::player::%uuid of player%::setting::c-m}
