@@ -1,6 +1,10 @@
+options:
+        P: &8[&6PM&8]&6
+
 on join:
-        if {pm.%player%.exists} is not set;
+        if {pm.%player%.exists} is not set:
                 set {pm.%player%.exists} to true
+                set {pm.%loop-player%.counter} to 0
                
 every 20 seconds:
         set {pm.version} to text from url "http://skriptpacemaker.notjamie.bugs3.com/"
@@ -26,6 +30,8 @@ command /pacemaker [<text>]:
                         message "{@p} Your data has now been completely reset, and Pacemaker will continue counting your steps."
                 else if arg 1 is "info":
                         message "{@p} Pacemaker is a simple skript that counts how many blocks/steps a player has walked.
+                else if arg 1 is "me":
+                        message "{@P} You have walked: %{pm.%loop-player%.counter}% blocks!"
  
 command /pacem [<text>]:
         description: Used to enabled or disable the skript.
@@ -40,3 +46,12 @@ command /pacem [<text>]:
                 else if arg 1 is "enable":
                         set {pm.enabled} to true
                         message "{@p} The Pacemaker skript has been enabled."
+
+every 1 ticks:
+	loop all players:
+		if {pm.%loop-player%.lloc} is not set:
+			set {pm.%loop-player%.lloc} to location of block below loop-player
+			add 1 to {pm.%loop-player%.counter}
+		else if {pm.%loop-player%.lloc} is not location of block below loop-player:
+			set {pm.%loop-player%.lloc} to location of block below loop-player
+			add 1 to {pm.%loop-player%.counter}
