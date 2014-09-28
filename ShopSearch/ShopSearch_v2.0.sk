@@ -10,7 +10,7 @@ options:
 	P: &8[&aSS&8]&a
 	Click-Here: &a&l
 	Other-Text: &a
-	Custom-Economy: false # Set to true for custom economy. See: http://nfell2009.uk/shopsearch/api?r=ce
+	Custom-Economy: false # Set to true for custom economy. See: http://nfell2009.uk/shopsearch/docs
 	CE-Command-Check: false
 	CE-Command-Check2: false
 	CE-Command-Add: false
