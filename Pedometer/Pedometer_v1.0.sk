@@ -1,32 +1,52 @@
 options:
         P: &8[&6PM&8]&6
 
- on join:
-        if {pm.%player%.exists} is not set;
+on join:
         if {pm.%player%.exists} is not set:
-                 set {pm.%player%.exists} to true
+                set {pm.%player%.exists} to true
                 set {pm.%loop-player%.counter} to 0
-                
- every 20 seconds:
-         set {pm.version} to text from url "http://skriptpedometer.notjamie.bugs3.com/"
- @@ -26,6 +30,8 @@ command /pedometer [<text>]:
-                         message "{@p} Your data has now been completely reset, and Pedometer will continue counting your steps."
-                 else if arg 1 is "info":
-                         message "{@p} Pedometer is a simple skript that counts how many blocks/steps a player has walked.
-                else if arg 1 is "steps":
-                        message "{@P} You have walked: %{pm.%loop-player%.counter}% blocks."
-				else if arg 1 is "credits":
-					message "{@P} Pedometer created by HoneyBuzzard/NotJamie, with code cleanups and help by nfell2009."
-  
- command /pedom [<text>]:
-         description: Used to enable or disable the skript.
- @@ -40,3 +46,12 @@ command /pedom [<text>]:
-                 else if arg 1 is "enable":
-                         set {pm.enabled} to true
-                         message "{@p} The Pedometer skript has been enabled."
-				 else if arg 1 is "disable":
-						set {pm.enabled} to false
-						message "{@p} The Pedometer skript has been disabled."
+               
+every 20 seconds:
+        set {pm.version} to text from url "http://skriptpacemaker.notjamie.bugs3.com/"
+        if {ss.version} is "1.0":
+                stop
+        else:
+                loop all players:
+                        loop-player has permission "pm.admin":
+                                send "{@P} You haven't updated Pacemaker to the latest version yet! Your version is &61.0&a. The latest version is &6%{pm.version}%&a." to loop-player
+               
+command /pacemaker [<text>]:
+        description: The main Pacemaker command.
+        permission: Pacemaker.usage
+        aliases: /pm
+        trigger:
+                if arg 1 is not set:
+                        message "{@p} You failed to give a subcommand!"
+                else if arg 1 is "reset":
+                        set {pm.%player%.exists} to false
+                        message "{@p} Please type /Pacemaker new and create new data!"
+                else if arg 1 is "new":
+                        set {pm.%player%.exists} to true
+                        message "{@p} Your data has now been completely reset, and Pacemaker will continue counting your steps."
+                else if arg 1 is "info":
+                        message "{@p} Pacemaker is a simple skript that counts how many blocks/steps a player has walked.
+                else if arg 1 is "me":
+                        message "{@P} You have walked: %{pm.%loop-player%.counter}% blocks!"
+ 
+command /pacem [<text>]:
+        description: Used to enabled or disable the skript.
+        permission: pacem.usage
+        aliases:
+        trigger:
+                if arg 1 is not set:
+                        message "{@p} You failed to give a subcommand!"
+                else if arg 1 is "disable":
+                        set {pm.enabled} to false
+                        message "{@p} The Pacemaker skript has been disabled."
+                else if arg 1 is "enable":
+                        set {pm.enabled} to true
+                        message "{@p} The Pacemaker skript has been enabled."
+
 every 1 ticks:
 	loop all players:
 		if {pm.%loop-player%.lloc} is not set:
