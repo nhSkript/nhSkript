@@ -8,7 +8,7 @@ on join:
 	       
 every 20 seconds:
 	set {pm.version} to text from url "http://skriptpacemaker.notjamie.bugs3.com/"
-	if {ss.version} is "1.0":
+	if {pm.version} is "1.0":
 		stop
 	else:
 		loop all players:
