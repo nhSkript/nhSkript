@@ -7,14 +7,13 @@ on join:
 		set {pm.%player%.counter} to 0
 	       
 every 20 seconds:
-	stop
 	set {pm.version} to text from url "http://skriptpacemaker.notjamie.bugs3.com/"
 	if {ss.version} is "1.0":
 		stop
 	else:
 		loop all players:
 			loop-player has permission "pm.admin":
-				send "{@P} You haven't updated Pacemaker to the latest version yet! Your version is &61.0&a. The latest version is &6%{pm.version}%&a." to loop-player
+				send "{@P} You haven't updated Pedometer to the latest version. Your version is &61.0&a and the latest version is &6%{pm.version}%&a." to loop-player
 	       
 command /pedometer [<text>]:
 	description: The main pedometer command.
