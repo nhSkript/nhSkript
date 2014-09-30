@@ -7,7 +7,7 @@ on join:
 		set {pm.%player%.counter} to 0
 	       
 every 20 seconds:
-	set {pm.version} to text from url "http://skriptpacemaker.notjamie.bugs3.com/"
+	set {pm.version} to text from url "http://skriptpedometer.notjamie.bugs3.com//"
 	if {pm.version} is "1.0":
 		stop
 	else:
@@ -33,18 +33,18 @@ command /pedometer [<text>]:
 		else if arg 1 is "me":
 			message "{@P} You have walked: %{pm.%player%.counter}% blocks!"
  
-command /pedo [<text>]:
+command /pedom [<text>]:
 	description: Used to enabled or disable the skript.
-	permission: pedo.usage
+	permission: pedom.usage
 	trigger:
 		if arg 1 is not set:
 			message "{@P} You failed to give a subcommand!"
 		else if arg 1 is "disable":
 			set {pm.enabled} to false
-			message "{@P} The Pacemaker skript has been disabled."
+			message "{@P} The Pedometer skript has been disabled."
 		else if arg 1 is "enable":
 			set {pm.enabled} to true
-			message "{@P} The Pacemaker skript has been enabled."
+			message "{@P} The Pedometer skript has been enabled."
 
 every 1 ticks:
 	loop all players:
