@@ -15,27 +15,27 @@ every 20 seconds:
                         loop-player has permission "pm.admin":
                                 send "{@P} You haven't updated Pacemaker to the latest version yet! Your version is &61.0&a. The latest version is &6%{pm.version}%&a." to loop-player
                
-command /pacemaker [<text>]:
-        description: The main Pacemaker command.
-        permission: Pacemaker.usage
+command /pedometer [<text>]:
+        description: The main pedometer command.
+        permission: pedometer.usage
         aliases: /pm
         trigger:
                 if arg 1 is not set:
                         message "{@p} You failed to give a subcommand!"
                 else if arg 1 is "reset":
                         set {pm.%player%.exists} to false
-                        message "{@p} Please type /Pacemaker new and create new data!"
+                        message "{@p} Please type /pedometer new and create new data!"
                 else if arg 1 is "new":
                         set {pm.%player%.exists} to true
-                        message "{@p} Your data has now been completely reset, and Pacemaker will continue counting your steps."
+                        message "{@p} Your data has now been completely reset, and pedometer will continue counting your steps."
                 else if arg 1 is "info":
-                        message "{@p} Pacemaker is a simple skript that counts how many blocks/steps a player has walked.
+                        message "{@p} pedometer is a simple skript that counts how many blocks/steps a player has walked.
                 else if arg 1 is "me":
                         message "{@P} You have walked: %{pm.%loop-player%.counter}% blocks!"
  
-command /pacem [<text>]:
+command /pedo [<text>]:
         description: Used to enabled or disable the skript.
-        permission: pacem.usage
+        permission: pedo.usage
         aliases:
         trigger:
                 if arg 1 is not set:
