@@ -471,6 +471,8 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 								add {_pr} to {myc.%{_p}%.money}
 							else if {pp::setting::running} is true:
 								add {_pr} to {pp::player::%{_u}%::balance}
+							else if {iEco.Balance.%player%} is set:
+								add {_pr} to {iEco.Balance.%player%}
 							else:
 								add {_pr} to the balance of {_p}
 							message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
@@ -498,6 +500,8 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 								add {_pr} to {myc.%{_p}%.money}
 							else if {pp::setting::running} is true:
 								add {_pr} to {pp::player::%{_u}%::balance}
+							else if {iEco.Balance.%player%} is set:
+								add {_pr} to {iEco.Balance.%player%}
 							else:
 								add {_pr} to the balance of {_p}
 							message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
@@ -563,8 +567,30 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
 					else:
 						message "{@P} You can't afford to do that"
+				else if {iEco.Balance.%player%} is set:
+					if {iEco.Balance.%player%} is greater than or equal to {_pr}
+						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
+							set {ss::stats::itm::%{_i}%} to {_i}
+							set {ss::stats::num::%{_i}%} to 1
+						else:
+							add 1 to {ss::stats::num::%{_i}%}
+						if {ss::player::%{_u}%::stats::playersales::p::%{_p}%} is not set:
+							set {ss::stats::playersales::p::%{_p}%} to {_p}
+							set {ss::stats::playersales::n::%{_p}%} to 1
+						else:
+							add 1 to {ss::stats::playersales::n::%{_p}%}
+						add {_pr} to {ss::global::totalmoney}
+						execute console command "/ss-console remove {_i} {_a} _cloc"
+						execute console command "/ss-console give {_i} {_a} {_p}"
+						subtract {_pr} from {iEco.Balance.%player%}
+						add {_pr} to {iEco.Balance.%player%}
+						message "{@P} You just bought %{_a}% %{_i}% from %{_p}% for %{_pr}%"
+						delete {ss::player::%uuid of player%::transaction::*}
+						add 1 to {ss::player::%{_u}%::sales::%{_cloc}%}
+					else:
+						message "{@P} You can't afford to do that"
 				else:
-					if player's balance is greater than or equal to {_price}:
+					if player's balance is greater than or equal to {_pr}
 						if {ss::player::%uuid of player%::stats::itemlist::itm::%{_i}%} is not set:
 							set {ss::stats::itm::%{_i}%} to {_i}
 							set {ss::stats::num::%{_i}%} to 1
