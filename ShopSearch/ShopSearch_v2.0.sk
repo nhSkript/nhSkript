@@ -5,6 +5,22 @@
 # © nhSkript - nfell2009 & HoneyBuzzard
 # Please note: the converter requires ShopSearch_v1.4 for a full conversion
 # Do NOT redistrubute this code! For more info see: http://nfell2009.uk/shopsearch/no-to-sharing
+#
+# ShopSearch supports these checkout operators:
+# MyConomy
+# PayPoint
+# Custom Economy Scripts
+# GiftCard
+# iEco
+# Economy plugins
+#
+# This is the order in which ShopSearch checks which to use (if it finds running one it will use it):
+# GiftCard
+# Custom Economy Scripts
+# MyConomy
+# PayPoint
+# iEco
+# Economy plugins
 
 options:
 	P: &8[&aSS&8]&a
