@@ -1,0 +1,56 @@
+options:
+	P: &8[&6PM&8]&6
+
+on join:
+	if {pm.%player%.exists} is not set:
+		set {pm.%player%.exists} to true
+		set {pm.%player%.counter} to 0
+	       
+every 20 seconds:
+	set {pm.version} to text from url "http://skriptpedometer.notjamie.bugs3.com//"
+	if {pm.version} is "1.0":
+		stop
+	else:
+		loop all players:
+			loop-player has permission "pm.admin":
+				send "{@P} You haven't updated Pedometer to the latest version. Your version is &61.0&a and the latest version is &6%{pm.version}%&a." to loop-player
+	       
+command /pedometer [<text>]:
+	description: The main pedometer command.
+	permission: pedometer.usage
+	aliases: /pm
+	trigger:
+		if arg 1 is not set:
+			message "{@P} You failed to give a subcommand!"
+		else if arg 1 is "reset":
+			set {pm.%player%.exists} to false
+			message "{@P} Please type /pedometer new and create new data!"
+		else if arg 1 is "new":
+			set {pm.%player%.exists} to true
+			message "{@P} Your data has now been completely reset, and pedometer will continue counting your steps."
+		else if arg 1 is "info":
+			message "{@P} pedometer is a simple skript that counts how many blocks/steps a player has walked."
+		else if arg 1 is "me":
+			message "{@P} You have walked: %{pm.%player%.counter}% blocks!"
+ 
+command /pedom [<text>]:
+	description: Used to enabled or disable the skript.
+	permission: pedom.usage
+	trigger:
+		if arg 1 is not set:
+			message "{@P} You failed to give a subcommand!"
+		else if arg 1 is "disable":
+			set {pm.enabled} to false
+			message "{@P} The Pedometer skript has been disabled."
+		else if arg 1 is "enable":
+			set {pm.enabled} to true
+			message "{@P} The Pedometer skript has been enabled."
+
+on player movement:
+	loop all players:
+		if {pm.%loop-player%.lloc} is not set:
+			set {pm.%loop-player%.lloc} to location of block below loop-player
+			add 1 to {pm.%loop-player%.counter}
+		else if {pm.%loop-player%.lloc} is not location of block below loop-player:
+			set {pm.%loop-player%.lloc} to location of block below loop-player
+			add 1 to {pm.%loop-player%.counter}
