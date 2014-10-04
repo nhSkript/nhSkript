@@ -353,6 +353,8 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 							set {ss::player::%uuid of player%::startedsearch} to now
 							loop {ss::setting::playerlist::*}:
 								add 1 to {_users}
+								set {_p} to loop-value parsed as offline player
+								set {_u} to uuid of {_p}
 								loop {ss::player::%uuid of loop-value%::chests::*}:
 									add 1 to {_shops}
 									set {_loc} to loop-value
@@ -399,6 +401,8 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 			else:
 				if arg 3 is set:
 					if arg 4 is set:
+						set {_p} to arg 2 parsed as offline player
+						set {_u} to uuid of {_p}
 						set {_i} to arg 3 parsed as item
 						set {_a} to arg 4 parsed as number
 						if {_a} contains ".":
@@ -408,42 +412,40 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 						set {_shops} to 0
 						set {_users} to 0
 						set {ss::player::%uuid of player%::startedsearch} to now
-						loop {ss::setting::playerlist::*}:
-							add 1 to {_users}
-							loop {ss::player::%uuid of loop-value%::chests::*}:
-								add 1 to {_shops}
-								set {_loc} to loop-value
-								set {_bloc} to loop-value
-								add 1 to y coord of {_loc}
-								if block at {_loc} is sign:
-									set {_b} to block at {_loc}
-								if line 1 of {_b} is "[Chest Shop]":
-									set {_p} to {McCS.Owner.%{_loc}%}
-									set {_t} to true
-								else if line 1 of {_b} is {_p}:
-									set {_t} to true
-								if {_t} is true:
-									if line 2 of {_b} is {_a}:
-										if block at {_bloc} contains {_a} of {_i}:
-											if line 4 of {_b} is {_i}:
-												set {_l3} to line 3 of {_b}
-												set {_arr::*} to {_l3} split at ":"
-												set {_l3} to {_arr::1}
-												replace all "B" and " " in {_l3} with ""
-												set {ss::player::%uuid of player%::transaction::buying} to true
-												set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
-												set {ss::player::%uuid of player%::transaction::chest-loc} to {_bloc}
-												set {ss::player::%uuid of player%::transaction::amount} to {_a}
-												set {ss::player::%uuid of player%::transaction::item} to {_i}
-												set {ss::player::%uuid of player%::transaction::playerto} to {_p}
-												set {ss::player::%uuid of player%::transaction::price} to {_l3}
-												message "{@P} ShopSearch has found a perfect match for you!"
-												message "{@P} Item: %{_i}%"
-												message "{@P} Amount: %{_a}%"
-												message "{@P} Price: %{_l3}%"
-												message "{@P} Buying from: %{_p}%"
-												send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
-												exit
+						loop {ss::player::%{_u}%::chests::*}:
+							add 1 to {_shops}
+							set {_loc} to loop-value
+							set {_bloc} to loop-value
+							add 1 to y coord of {_loc}
+							if block at {_loc} is sign:
+								set {_b} to block at {_loc}
+							if line 1 of {_b} is "[Chest Shop]":
+								set {_p} to {McCS.Owner.%{_loc}%}
+								set {_t} to true
+							else if line 1 of {_b} is {_p}:
+								set {_t} to true
+							if {_t} is true:
+								if line 2 of {_b} is {_a}:
+									if block at {_bloc} contains {_a} of {_i}:
+										if line 4 of {_b} is {_i}:
+											set {_l3} to line 3 of {_b}
+											set {_arr::*} to {_l3} split at ":"
+											set {_l3} to {_arr::1}
+											replace all "B" and " " in {_l3} with ""
+											set {ss::player::%uuid of player%::transaction::buying} to true
+											set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
+											set {ss::player::%uuid of player%::transaction::chest-loc} to {_bloc}
+											set {ss::player::%uuid of player%::transaction::amount} to {_a}
+											set {ss::player::%uuid of player%::transaction::item} to {_i}
+											set {ss::player::%uuid of player%::transaction::playerto} to {_p}
+											set {ss::player::%uuid of player%::transaction::price} to {_l3}
+											message "{@P} ShopSearch has found a perfect match for you!"
+											message "{@P} Item: %{_i}%"
+											message "{@P} Amount: %{_a}%"
+											message "{@P} Price: %{_l3}%"
+											message "{@P} Buying from: %{_p}%"
+											send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
+											exit
 						message "{@P} Stats about this search..."
 						message "{@P} ShopSearch checked: %{_users}%/%size of {ss::setting::playerlist::*}% users"
 						message "{@P} ShopSearch checked: %{_shops}% shops"
