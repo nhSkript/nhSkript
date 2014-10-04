@@ -386,7 +386,10 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 													message "{@P} Price: %{_l3}%"
 													message "{@P} Buying from: %{_p}%"
 													send json of "{@P} {@Click-Here}Click Here " tooltip "{@P} To confirm your purchase" run "/ss confirm" then "{@Other-Text}to confirm your purchase" to player
+													set {_searched} to true
 													exit
+								if {_searched} is true:
+									exit
 							message "{@P} Stats about this search..."
 							message "{@P} ShopSearch checked: %{_users}%/%size of {ss::setting::playerlist::*}% users"
 							message "{@P} ShopSearch checked: %{_shops}% shops"
