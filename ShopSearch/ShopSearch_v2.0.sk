@@ -373,8 +373,9 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 											if block at {_bloc} contains {_a} of {_i}:
 												if line 4 of {_b} is {_i}:
 													set {_l3} to line 3 of {_b}
-													set {_arr::*} to {_l3} split at ":"
-													set {_l3} to {_arr::1}
+													if {_l3} contains ":":
+														set {_arr::*} to {_l3} split at ":"
+														set {_l3} to {_arr::1}
 													replace all "B" and " " in {_l3} with ""
 													set {ss::player::%uuid of player%::transaction::buying} to true
 													set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
@@ -430,8 +431,9 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 									if block at {_bloc} contains {_a} of {_i}:
 										if line 4 of {_b} is {_i}:
 											set {_l3} to line 3 of {_b}
-											set {_arr::*} to {_l3} split at ":"
-											set {_l3} to {_arr::1}
+											if {_l3} contains ":":
+												set {_arr::*} to {_l3} split at ":"
+												set {_l3} to {_arr::1}
 											replace all "B" and " " in {_l3} with ""
 											set {ss::player::%uuid of player%::transaction::buying} to true
 											set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
@@ -480,8 +482,9 @@ command /shopsearch [<text>] [<text>] [<text>] [<text>]:
 									if block at {_bloc} contains {_a} of {_i}:
 										if line 4 of {_b} is {_i}:
 											set {_l3} to line 3 of {_b}
-											set {_arr::*} to {_l3} split at ":"
-											set {_l3} to {_arr::1}
+											if {_l3} contains ":":
+												set {_arr::*} to {_l3} split at ":"
+												set {_l3} to {_arr::1}
 											replace all "B" and " " in {_l3} with ""
 											set {ss::player::%uuid of player%::transaction::buying} to true
 											set {ss::player::%uuid of player%::transaction::sign-loc} to {_loc}
@@ -720,8 +723,10 @@ command /ss-console [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text
 			set {ss::player::%{_u}%::transaction::buying} to true
 			set {ss::player::%{_u}%::transaction::playerto} to arg 3
 			set {ss::player::%{_u}%::transaction::amount} to arg 4
-			set {_pr::*} to arg 5 split at ":"
-			set {_ppr} to {_pr::1}
+			set {_ppr} to arg 5
+			if {_ppr} contains ":":
+				set {_pr::*} to {_ppr} split at ":"
+				set {_ppr} to {_pr::1}
 			replace all "B" and " " in {_prr} with ""
 			set {ss::player::%{_u}%::transaction::price} to {_ppr}
 			set {ss::player::%{_u}%::transaction::item} to arg 6
@@ -767,8 +772,11 @@ on rightclick on chest:
 							set {ss::quickshop::%location of block%} to {_c}
 							set {ss::quickshop::%{_c}%::playerto} to player
 							set {ss::quickshop::%{_c}%::amount} to line 2 of {_b} parsed as number
-							set {_price::*} to line 3 of {_b} split at ":"
-							replace all "B" and " " in {_price::1} with ""
+							set {_ppppp} to line 3 of {_b}
+							if line 3 of {_b} contains ":":
+								set {_price::*} to line 3 of {_b} split at ":"
+								set {_ppppp} to {_price::1}
+							replace all "B" and " " in {_ppppp} with ""
 							set {ss::quickshop::%{_c}%::price} to {_price::1} parsed as number
 							set {ss::quickshop::%{_c}%::item} to line 4 of {_b} parsed as item
 							delete {ss::player::%uuid of player%::setting::add-num}
