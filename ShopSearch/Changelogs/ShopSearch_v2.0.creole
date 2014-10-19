@@ -1,2 +1,18 @@
 == ShopSearch v2.0 Changelog ==
 
++ Support for multiple checkout operators\\
+  + MyConomy\\
+  + Custom economy script\\
+  + Economy plugins\\
+  + iEco\\
+  + PayPoint\\
+  + GiftCard\\
++ Custom command API\\
++ Stats Improvements\\
++ Changes to Menu's, Add & Remove\\
++ Admin Commands update\\
++ About ShopSearch command\\
++ GlobalSearch (off by default)\\
++ About player (/ss about <me>)\\
++ Better updater\\
++ Some other features that I've forgot to put
