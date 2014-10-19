@@ -15,4 +15,5 @@
 + GlobalSearch (off by default)\\
 + About player (/ss about <me>)\\
 + Better updater\\
++ Made searching more efficient\\
 + Some other features that I've forgot to put
