@@ -27,12 +27,12 @@
 # Economy plugins
 #
 # This is the order in which ShopSearch checks which to use (if it finds running one it will use it):
-# GiftCard
-# Custom Economy Scripts
-# MyConomy
-# PayPoint
-# iEco
-# Economy plugins
+# 1) GiftCard (Will use the value of the GiftCard and then continue if the price is over the value of the card)
+# 2) Custom Economy Scripts
+# 3) MyConomy
+# 4) PayPoint
+# 5) iEco
+# 6) Economy plugins
 
 
 options:
