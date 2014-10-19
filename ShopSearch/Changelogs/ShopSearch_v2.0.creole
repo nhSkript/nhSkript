@@ -7,7 +7,6 @@
   + iEco\\
   + PayPoint\\
   + GiftCard\\
-+ Custom command API\\
 + Stats Improvements\\
 + Changes to Menu's, Add & Remove\\
 + Admin Commands update\\
@@ -16,4 +15,7 @@
 + About player (/ss about <me>)\\
 + Better updater\\
 + Made searching more efficient\\
++ API Overhaul\\
+  + Custom commands\\
+  + Custom economy script for checkout\\
 + Some other features that I've forgot to put
