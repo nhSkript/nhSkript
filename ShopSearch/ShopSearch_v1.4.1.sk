@@ -8,7 +8,7 @@ options:
 	# To change the currency symbol just change the £ sign below to whatever.
 	
 on script load:
-	set {ss.version} to 1.4
+	set {ss.version} to 1.4.1
 	set {ss.currency} to "£" # Currency symbol.
 	wait 1 second
 	if {ss.codegenapi.key} is not set:
