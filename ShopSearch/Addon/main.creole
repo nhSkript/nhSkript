@@ -1,6 +1,6 @@
 == ShopSearch skQuery Addon ==
 
-With skQuery 22.0 comes the ability to make mini-addons. At nhSkript, we're trying to advanced ShopSearch into an easy to use Skript. 
+With skQuery 3.22.0 comes the ability to make mini-addons. At nhSkript, we're trying to advanced ShopSearch into an easy to use Skript. 
 
 ShopSearch will have it's own addon meaning that developers can easily hook into ShopSearch without the need of having to run console commands and attempt retrieving variables.
 
