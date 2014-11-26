@@ -2,3 +2,18 @@
 -- Uncompiled code
 -- ShopSearch by nfell2009 & HoneyBuzzard (nhSkript)
 
+-- Deleting data
+
+declare effect "delete variable data of %player%"
+declare effect "delete all chests of %player%"
+declare effect "delete all data of %player%"
+
+-- Creating user
+
+declare effect "create shopsearch data for %player%"
+
+-- User control
+
+declare effect "set shops of %player% to %player%"
+declare effect "block user %player% from shopsearch"
+declare effect "unblock user %player% from shopsearch"
