@@ -1,0 +1,53 @@
+#
+#	Lift.sk
+#	By nfell2009
+#	All rights reserved.
+#
+
+options:
+	P: &c&lLift &7»&e
+	Permission: lift.create
+	Line1: "&9[Lift]"
+	PLine1: "lift, [lift], &9[Lift]"
+
+on sign change:
+	set {_ll} to {@PLine1}
+	replace all " " in {_ll} with ""
+	set {_l1::*} to {_ll} split at ","
+	loop {_l1::*}:
+		if line 1 is loop-value:
+			set {_create.lift} to true
+	if {_create.lift} is true:
+		if player doesn't have permission "{@Permission}":
+			message "{@P} You don't have pemrission to create lifts :("
+			stop
+		set line 1 to {@Line1}
+		if line 2 is "up":
+			set line 2 to "Up"
+		else:
+			set line 2 to "Down"
+
+on rightclick on sign:
+	set {_block.sign} to block
+	if {_block.sign} is sign:
+		set {_loc.sign} to location of block above block
+		if line 2 of {_block.sign} is "down":
+			subtract 2 from y coord of {_loc.sign}
+			while block at {_loc.sign} is not sign:
+				subtract 1 from y coord of {_loc.sign}
+				if y coord of {_loc.sign} is less than or equal to 0:
+					message "{@P} No floors below found"
+					stop
+			set {_loc.player} to location of player
+			set y coord of {_loc.player} to y coord of {_loc.sign} - 1
+			teleport the player to {_loc.player}
+		else if line 2 of {_block.sign} is "up":
+			add 1 to y coord of {_loc.sign}
+			while block at {_loc.sign} is not sign:
+				add 1 to y coord of {_loc.sign}
+				if y coord of {_loc.sign} is greater than or equal to 255:
+					message "{@P} No floors above found"
+					stop
+			set {_loc.player} to location of player
+			set y coord of {_loc.player} to y coord of {_loc.sign} - 1
+			teleport the player to {_loc.player}
