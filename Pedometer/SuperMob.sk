@@ -1,0 +1,51 @@
+every 3600 seconds:
+	if {pm.enabled} is not true:
+		stop
+	set {sm.version} to text from url "http://supermobversion.notjamie.bugs3.com//"
+	if {pm.version} is "1.0"
+		stop
+	else:
+		loop all players:
+			loop-player has permission "sm.admin"
+				send "{@P} You haven't updated Super Mob to the latest version. Your version is &61.0&a and the latest version is &6%{sm.version}%&a." to loop-player
+			
+command /supermob [<text>]:
+	description: The main Super Mob command.
+	permission: supermob.usage
+	aliases: /sm
+	trigger:
+		if arg 1 is not set:
+			message "{@P} You've failed to give a subcommand!"
+		else if arg 1 is "info":
+			message "{@P} Super Mob is a skript that spawns some mobs that are more powerful than usual." 
+		else if arg 1 is "killcount":
+			message "{@P} You have killed %{sm.%player%.counter}% super mobs!"
+			
+command /supermob admin [<text>]:
+	description: The Super Mob admin commands.
+	permission: supermobadmin.usage
+	trigger:
+		if arg 1 is not set:
+			message "{@P} You've failed to give a subcommand!"
+		else if arg 1 is "disable":
+			set {sm.enabled} to false
+			message "{@P} Super Mob has been disabled."
+		else if arg 1 is "enable":
+			set {sm.enabled} to true
+			message "{@P} Super Mob has been enabled."
+		else if arg 1 is "broadcasts enable"
+			set {sm.broadcasts} to true
+			message "{@P} Broadcasts have been enabled."
+		else if arg 1 is "broadcasts disable"
+			set {sm.broadcasts} to false
+			message "{@P} Broadcasts have been disabled."
+	
+on chunk load:
+	chance of 10%:
+		spawn charged creeper
+		set max health of last spawned entity to 11
+		
+on death of charged creeper:
+	add "diamond chestplate" to drops
+	if {sm.broadcasts} is true:
+		broadcast "%player% has killed a Super-Charged Creeper!"
