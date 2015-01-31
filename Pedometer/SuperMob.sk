@@ -20,6 +20,8 @@ command /supermob [<text>]:
 			message "{@P} Super Mob is a skript that spawns some mobs that are more powerful than usual." 
 		else if arg 1 is "killcount":
 			message "{@P} You have killed %{sm.%player%.counter}% super mobs!"
+		else if arg 1 is "help":
+			message "{@P} Use /supermob info to find out more about this skript, or use /supermob killcount to see how many Super Mobs you have killed."
 			
 command /supermob admin [<text>]:
 	description: The Super Mob admin commands.
@@ -40,12 +42,83 @@ command /supermob admin [<text>]:
 			set {sm.broadcasts} to false
 			message "{@P} Broadcasts have been disabled."
 	
-on chunk load:
-	chance of 10%:
+on spawn:
+	chance of 3%:
 		spawn charged creeper
-		set max health of last spawned entity to 11
+		set max health of last spawned entity to 17
 		
 on death of charged creeper:
-	add "diamond chestplate" to drops
+	add "diamond" to drops
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a Super-Charged Creeper!"
+		
+on spawn:
+	chance of 15%
+		spawn zombie
+		set max health of last spawned entity to 11
+		equip the last spawned entity with glowing leather chestplate
+		
+on death of zombie:
+	add "wood spade" to drops
+	add "leather chestplate" to drops
+	if {sm.broadcasts} is true:
+		broadcast "%player% has killed an Uncommon Super Zombie!"
+		
+on spawn:
+	chance of 10%
+		spawn zombie
+		set max health of last spawned entity to 13
+		equip the last spawned entity with glowing iron chestplate
+		
+on death of zombie:
+	add "iron chestplate" to drops
+	if {sm.broadcasts} is true:
+		broadcast "%player% has killed a Kind of Rare Super Zombie!"
+		
+on spawn:
+	chance of 2%
+		spawn zombie
+		set max health of last spawned entity to 20
+		equip the last spawned entity with glowing diamond chestplate
+		
+on death of zombie:
+	add "diamond" to drops
+	add "diamond chestplate" to drops
+	if {sm.broadcasts} is true:
+		broadcast "%player% has killed a Super Rare Super Zombie!"
+		
+on spawn:
+	chance of 15%
+		spawn skeleton
+		set max health of last spawned entity to 11
+		equip the last spawned entity with glowing leather leggings
+
+on death of skeleton:
+	add "leather leggings" to drops
+	add "coal" to drops
+	if {sm.broadcasts} is true:
+		broadcast "%player% has killed an Uncommon Super Skeleton!"
+		
+on spawn:
+	chance of 5%
+		spawn skeleton
+		set max health of last spawned entity to 13
+		equip the last spawned entity with glowing iron leggings
+
+on death of skeleton:
+	add "iron leggings" to drops
+	if {sm.broadcasts} is true:
+		broadcast "%player% has killed an Uncommon-ish Super Skeleton!"
+	
+on spawn:
+	chance of 1%
+		spawn skeleton
+		set max health of last spawned entity to 18
+		set 
+		equip the last spawned entity with glowing diamond leggings
+
+on death of skeleton:
+	add "diamond leggings" to drops
+	add "diamond" to drops
+	if {sm.broadcasts} is true:
+		broadcast "%player% has killed a rare Super Skeleton!"
