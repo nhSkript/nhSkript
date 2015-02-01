@@ -6,13 +6,13 @@ every 3600 seconds:
 		stop
 	else:
 		loop all players:
-			loop-player has permission "sm.admin"
+			loop-player has permission "sm.admin":
 				send "{@P} You haven't updated Super Mob to the latest version. Your version is &61.0&a and the latest version is &6%{sm.version}%&a." to loop-player
 			
 command /supermob [<text>]:
-	description: The main Super Mob command.
-	permission: supermob.usage
-	aliases: /sm
+	description: The main Super Mob command
+	permission: supermob.usage,
+	aliases: /sm,
 	trigger:
 		if arg 1 is not set:
 			message "{@P} You've failed to give a subcommand!"
@@ -24,8 +24,8 @@ command /supermob [<text>]:
 			message "{@P} Use /supermob info to find out more about this skript, or use /supermob killcount to see how many Super Mobs you have killed."
 			
 command /supermob-admin [<text>]:
-	description: The Super Mob admin commands.
-	permission: supermobadmin.usage
+	description: The Super Mob admin commands
+	permission: supermobadmin.usage,
 	trigger:
 		if arg 1 is not set:
 			message "{@P} You've failed to give a subcommand!"
@@ -47,32 +47,32 @@ on spawn:
 		spawn charged creeper
 		set max health of last spawned entity to 17
 		stop
-	chance of 15%
+	chance of 15%:
 		spawn zombie
 		set max health of last spawned entity to 11
 		equip the last spawned entity with glowing leather chestplate
 		stop
-	chance of 10%
+	chance of 10%:
 		spawn zombie
 		set max health of last spawned entity to 13
 		equip the last spawned entity with glowing iron chestplate
 		stop
-	chance of 2%
+	chance of 2%:
 		spawn zombie
 		set max health of last spawned entity to 20
 		equip the last spawned entity with glowing diamond chestplate
 		stop
-	chance of 15%
+	chance of 15%:
 		spawn skeleton
 		set max health of last spawned entity to 11
 		equip the last spawned entity with glowing leather leggings
 		stop
-	chance of 5%
+	chance of 5%:
 		spawn skeleton
 		set max health of last spawned entity to 13
 		equip the last spawned entity with glowing iron leggings
 		stop
-	chance of 1%
+	chance of 1%:
 		spawn skeleton
 		set max health of last spawned entity to 18
 		set 
