@@ -49,6 +49,7 @@ on spawn:
 		
 on death of charged creeper:
 	add "diamond" to drops
+	add 1 to {sm.%loop-player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a Super-Charged Creeper!"
 		
@@ -61,6 +62,7 @@ on spawn:
 on death of zombie:
 	add "wood spade" to drops
 	add "leather chestplate" to drops
+	add 1 to {sm.%loop-player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed an Uncommon Super Zombie!"
 		
@@ -84,6 +86,7 @@ on spawn:
 on death of zombie:
 	add "diamond" to drops
 	add "diamond chestplate" to drops
+	add 1 to {sm.%loop-player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a Super Rare Super Zombie!"
 		
@@ -96,6 +99,7 @@ on spawn:
 on death of skeleton:
 	add "leather leggings" to drops
 	add "coal" to drops
+	add 1 to {sm.%loop-player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed an Uncommon Super Skeleton!"
 		
@@ -107,6 +111,7 @@ on spawn:
 
 on death of skeleton:
 	add "iron leggings" to drops
+	add 1 to {sm.%loop-player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed an Uncommon-ish Super Skeleton!"
 	
@@ -120,5 +125,6 @@ on spawn:
 on death of skeleton:
 	add "diamond leggings" to drops
 	add "diamond" to drops
+	add 1 to {sm.%loop-player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a rare Super Skeleton!"
