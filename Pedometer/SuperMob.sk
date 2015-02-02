@@ -55,7 +55,7 @@ on spawn:
 	chance of 10%:
 		spawn zombie
 		set max health of last spawned entity to 13
-		equip the last spawned entity with glowing iron chestplate
+		equip the last spawned entity with "glowing iron chestplate"
 		stop
 	chance of 2%:
 		spawn zombie
