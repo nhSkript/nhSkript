@@ -25,7 +25,11 @@ command /supermob [<text>]:
 			message "{@P} You have killed %{sm.%uuid of player%.counter}% super mobs!"
 		else if arg 1 is "help":
 			message "{@P} Use /supermob info to find out more about this skript, or use /supermob killcount to see how many Super Mobs you have killed."
-			
+		
+on join:
+	if {sm.%uuid of player%.counter} is not set:
+		set {sm.%uuid of player%.counter} to 0
+
 command /supermob-admin [<text>]:
 	description: The Super Mob admin commands
 	permission: supermobadmin.usage,
