@@ -47,7 +47,7 @@ command /supermob-admin [<text>]:
 	
 on spawn:
 	chance of 3%:
-		spawn a powered creeper at event-location
+		spawn a powered creeper
 		set max health of last spawned entity to 17
 		stop
 	chance of 15%:
