@@ -87,46 +87,53 @@ on spawn:
 		
 		
 on death of powered creeper:
-	add diamond to drops
-	add 1 to {sm.%uuid of player%.counter}
-	if {sm.broadcasts} is true:
-		broadcast "%player% has killed a Super-Charged Creeper!"
+	if attacker is player:
+		add diamond to drops
+		add 1 to {sm.%uuid of player%.counter}
+		if {sm.broadcasts} is true:
+			broadcast "%player% has killed a Super-Charged Creeper!"
 		
 on death of zombie:
-	add wood spade to drops
-	add leather chestplate to drops
-	add 1 to {sm.%uuid of player%.counter}
-	if {sm.broadcasts} is true:
-		broadcast "%player% has killed an Uncommon Super Zombie!"
+	if attacker is player:
+		add wood spade to drops
+		add leather chestplate to drops
+		add 1 to {sm.%uuid of player%.counter}
+		if {sm.broadcasts} is true:
+			broadcast "%player% has killed an Uncommon Super Zombie!"
 
 on death of zombie:
-	add iron chestplate to drops
-	if {sm.broadcasts} is true:
-		broadcast "%player% has killed a Kind of Rare Super Zombie!"
+	if attacker is player:
+		add iron chestplate to drops
+		if {sm.broadcasts} is true:
+			broadcast "%player% has killed a Kind of Rare Super Zombie!"
 
 on death of zombie:
-	add diamond to drops
-	add diamond chestplate to drops
-	add 1 to {sm.%uuid of player%.counter}
-	if {sm.broadcasts} is true:
-		broadcast "%player% has killed a Super Rare Super Zombie!"
+	if attacker is player:
+		add diamond to drops
+		add diamond chestplate to drops
+		add 1 to {sm.%uuid of player%.counter}
+		if {sm.broadcasts} is true:
+			broadcast "%player% has killed a Super Rare Super Zombie!"
 
 on death of skeleton:
-	add leather leggings to drops
-	add coal to drops
-	add 1 to {sm.%uuid of player%.counter}
-	if {sm.broadcasts} is true:
-		broadcast "%player% has killed an Uncommon Super Skeleton!"
+	if attacker is player:
+		add leather leggings to drops
+		add coal to drops
+		add 1 to {sm.%uuid of player%.counter}
+		if {sm.broadcasts} is true:
+			broadcast "%player% has killed an Uncommon Super Skeleton!"
 
 on death of skeleton:
-	add iron leggings to drops
-	add 1 to {sm.%uuid of player%.counter}
-	if {sm.broadcasts} is true:
-		broadcast "%player% has killed an Uncommon-ish Super Skeleton!"
+	if attacker is player:
+		add iron leggings to drops
+		add 1 to {sm.%uuid of player%.counter}
+		if {sm.broadcasts} is true:
+			broadcast "%player% has killed an Uncommon-ish Super Skeleton!"
 
 on death of skeleton:
-	add diamond leggings to drops
-	add diamond to drops
-	add 1 to {sm.%uuid of player%.counter}
-	if {sm.broadcasts} is true:
-		broadcast "%player% has killed a rare Super Skeleton!"
+	if attacker is player:
+		add diamond leggings to drops
+		add diamond to drops
+		add 1 to {sm.%uuid of player%.counter}
+		if {sm.broadcasts} is true:
+			broadcast "%player% has killed a rare Super Skeleton!"
