@@ -1,8 +1,11 @@
+options:
+	P: &a
+
 every 3600 seconds:
 	if {sm.enabled} is not true:
 		stop
 	set {sm.version} to text from url "http://supermobversion.notjamie.bugs3.com//"
-	if {sm.version} is "1.0"
+	if {sm.version} is "1.0":
 		stop
 	else:
 		loop all players:
@@ -19,7 +22,7 @@ command /supermob [<text>]:
 		else if arg 1 is "info":
 			message "{@P} Super Mob is a skript that spawns some mobs that are more powerful than usual." 
 		else if arg 1 is "killcount":
-			message "{@P} You have killed %{sm.%player%.counter}% super mobs!"
+			message "{@P} You have killed %{sm.%uuid of player%.counter}% super mobs!"
 		else if arg 1 is "help":
 			message "{@P} Use /supermob info to find out more about this skript, or use /supermob killcount to see how many Super Mobs you have killed."
 			
@@ -35,16 +38,16 @@ command /supermob-admin [<text>]:
 		else if arg 1 is "enable":
 			set {sm.enabled} to true
 			message "{@P} Super Mob has been enabled."
-		else if arg 1 is "broadcasts enable"
+		else if arg 1 is "broadcasts enable":
 			set {sm.broadcasts} to true
 			message "{@P} Broadcasts have been enabled."
-		else if arg 1 is "broadcasts disable"
+		else if arg 1 is "broadcasts disable":
 			set {sm.broadcasts} to false
 			message "{@P} Broadcasts have been disabled."
 	
 on spawn:
 	chance of 3%:
-		spawn charged creeper
+		spawn a powered creeper at event-location
 		set max health of last spawned entity to 17
 		stop
 	chance of 15%:
@@ -55,7 +58,7 @@ on spawn:
 	chance of 10%:
 		spawn zombie
 		set max health of last spawned entity to 13
-		equip the last spawned entity with "glowing iron chestplate"
+		equip the last spawned entity with glowing iron chestplate
 		stop
 	chance of 2%:
 		spawn zombie
@@ -75,52 +78,51 @@ on spawn:
 	chance of 1%:
 		spawn skeleton
 		set max health of last spawned entity to 18
-		set 
 		equip the last spawned entity with glowing diamond leggings
 		stop
 		
 		
-on death of charged creeper:
-	add "diamond" to drops
-	add 1 to {sm.%loop-player%.counter}
+on death of powered creeper:
+	add diamond to drops
+	add 1 to {sm.%uuid of player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a Super-Charged Creeper!"
 		
 on death of zombie:
-	add "wood spade" to drops
-	add "leather chestplate" to drops
-	add 1 to {sm.%loop-player%.counter}
+	add wood spade to drops
+	add leather chestplate to drops
+	add 1 to {sm.%uuid of player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed an Uncommon Super Zombie!"
 
 on death of zombie:
-	add "iron chestplate" to drops
+	add iron chestplate to drops
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a Kind of Rare Super Zombie!"
 
 on death of zombie:
-	add "diamond" to drops
-	add "diamond chestplate" to drops
-	add 1 to {sm.%loop-player%.counter}
+	add diamond to drops
+	add diamond chestplate to drops
+	add 1 to {sm.%uuid of player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a Super Rare Super Zombie!"
 
 on death of skeleton:
-	add "leather leggings" to drops
-	add "coal" to drops
-	add 1 to {sm.%loop-player%.counter}
+	add leather leggings to drops
+	add coal to drops
+	add 1 to {sm.%uuid of player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed an Uncommon Super Skeleton!"
 
 on death of skeleton:
-	add "iron leggings" to drops
-	add 1 to {sm.%loop-player%.counter}
+	add iron leggings to drops
+	add 1 to {sm.%uuid of player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed an Uncommon-ish Super Skeleton!"
 
 on death of skeleton:
-	add "diamond leggings" to drops
-	add "diamond" to drops
-	add 1 to {sm.%loop-player%.counter}
+	add diamond leggings to drops
+	add diamond to drops
+	add 1 to {sm.%uuid of player%.counter}
 	if {sm.broadcasts} is true:
 		broadcast "%player% has killed a rare Super Skeleton!"
